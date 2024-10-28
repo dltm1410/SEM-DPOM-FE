@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Body from "./components/Body";
 import Footer from "./components/Footer";
@@ -9,11 +10,17 @@ import OrderSummary from "./components/OrderSummary";
 
 function App() {
   return (
-    <div>
+    <Router>
       <Navbar />
-      <OrderSummary />
+      <Routes>
+        <Route path="/" element={<Body />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/confirm-order" element={<ConfirmOrder />} />
+        <Route path="/order-summary" element={<OrderSummary />} />
+      </Routes>
       <Footer />
-    </div>
+    </Router>
   );
 }
 

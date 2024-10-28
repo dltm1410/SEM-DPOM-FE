@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -35,13 +36,12 @@ function Navbar() {
 
             <ul className="hidden items-center justify-start gap-6 py-3 sm:justify-center md:gap-8 lg:flex">
               <li>
-                <a
-                  href="#"
-                  title=""
-                  className="hover:text-primary-700 dark:hover:text-primary-500 flex text-sm font-medium text-gray-900 dark:text-white"
+                <Link
+                  to="/"
+                  className="hover:text-primary-700 dark:hover:text-primary-500"
                 >
                   Home
-                </a>
+                </Link>
               </li>
               <li className="shrink-0">
                 <a
@@ -377,14 +377,14 @@ function Navbar() {
                   </div>
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  to="/cart" // Set the destination route
                   title=""
                   className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-black focus:outline-none focus:ring-4"
                   role="button"
                 >
                   Proceed to Checkout
-                </a>
+                </Link>
               </div>
             )}
 
@@ -445,13 +445,13 @@ function Navbar() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/orders" // Set the destination route
                       title=""
                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                     >
                       My Orders
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a
@@ -536,12 +536,12 @@ function Navbar() {
         >
           <ul className="space-y-3 text-sm font-medium text-gray-900 dark:text-white dark:text-white">
             <li>
-              <a
-                href="#"
+              <Link
+                to="/"
                 className="hover:text-primary-700 dark:hover:text-primary-500"
               >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
               <a

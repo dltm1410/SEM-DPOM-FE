@@ -1,6 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
+import orders from "../data/order.json"; // Assuming your order data is in this path
 
 const Orders = () => {
+  const [orderType, setOrderType] = useState("All orders");
+  const [duration, setDuration] = useState("this week");
+
+  const filteredOrders = orders.filter((order) => {
+    // Filter based on selected order type
+    const typeMatch = orderType === "All orders" || order.status === orderType;
+
+    // Parse the order creation date
+    const orderDate = new Date(order.createDate);
+    const currentDate = new Date();
+    let dateMatch = false;
+
+    // Apply duration filtering logic
+    switch (duration) {
+      case "this week":
+        const startOfWeek = new Date(
+          currentDate.setDate(currentDate.getDate() - currentDate.getDay())
+        );
+        dateMatch = orderDate >= startOfWeek && orderDate <= new Date();
+        break;
+      case "this month":
+        const startOfMonth = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+        dateMatch = orderDate >= startOfMonth && orderDate <= new Date();
+        break;
+      case "last 3 months":
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        dateMatch = orderDate >= threeMonthsAgo && orderDate <= new Date();
+        break;
+      case "last 6 months":
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        dateMatch = orderDate >= sixMonthsAgo && orderDate <= new Date();
+        break;
+      case "this year":
+        const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+        dateMatch = orderDate >= startOfYear && orderDate <= new Date();
+        break;
+      default:
+        dateMatch = true;
+    }
+
+    return typeMatch && dateMatch;
+  });
+
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -20,9 +70,11 @@ const Orders = () => {
                 </label>
                 <select
                   id="order-type"
+                  value={orderType}
+                  onChange={(e) => setOrderType(e.target.value)}
                   className="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                 >
-                  <option selected>All orders</option>
+                  <option value="All orders">All orders</option>
                   <option value="pre-order">Pre-order</option>
                   <option value="transit">In transit</option>
                   <option value="confirmed">Confirmed</option>
@@ -43,9 +95,11 @@ const Orders = () => {
                 </label>
                 <select
                   id="duration"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
                   className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                 >
-                  <option selected>this week</option>
+                  <option value="this week">this week</option>
                   <option value="this month">this month</option>
                   <option value="last 3 months">the last 3 months</option>
                   <option value="last 6 months">the last 6 months</option>
@@ -57,76 +111,16 @@ const Orders = () => {
 
           <div className="mt-6 flow-root sm:mt-8">
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              <OrderItem
-                orderId="#FWB127364372"
-                date="20.12.2023"
-                price="$4,756"
-                status="Pre-order"
-                statusColor="primary"
-              />
-              <OrderItem
-                orderId="#FWB125467980"
-                date="11.12.2023"
-                price="$499"
-                status="In transit"
-                statusColor="yellow"
-              />
-              <OrderItem
-                orderId="#FWB139485607"
-                date="08.12.2023"
-                price="$85"
-                status="Confirmed"
-                statusColor="green"
-              />
-              <OrderItem
-                orderId="#FWB137364371"
-                date="16.11.2023"
-                price="$119"
-                status="Confirmed"
-                statusColor="green"
-              />
-              <OrderItem
-                orderId="#FWB134567890"
-                date="02.11.2023"
-                price="$2,056"
-                status="Confirmed"
-                statusColor="green"
-              />
-              <OrderItem
-                orderId="#FWB146284623"
-                date="26.09.2023"
-                price="$180"
-                status="Cancelled"
-                statusColor="red"
-              />
-              <OrderItem
-                orderId="#FWB145967376"
-                date="17.07.2023"
-                price="$756"
-                status="Confirmed"
-                statusColor="green"
-              />
-              <OrderItem
-                orderId="#FWB148756352"
-                date="30.06.2023"
-                price="$235"
-                status="Confirmed"
-                statusColor="green"
-              />
-              <OrderItem
-                orderId="#FWB159873546"
-                date="04.06.2023"
-                price="$90"
-                status="Cancelled"
-                statusColor="red"
-              />
-              <OrderItem
-                orderId="#FWB156475937"
-                date="11.02.2023"
-                price="$1,845"
-                status="Confirmed"
-                statusColor="green"
-              />
+              {filteredOrders.map((order, index) => (
+                <OrderItem
+                  key={index}
+                  orderId={order.oID}
+                  date={order.createDate}
+                  price={order.totalPrice}
+                  status={order.status}
+                  statusColor={getStatusColor(order.status)}
+                />
+              ))}
             </div>
           </div>
 
@@ -135,97 +129,7 @@ const Orders = () => {
             aria-label="Page navigation example"
           >
             <ul className="flex h-8 items-center -space-x-px text-sm">
-              <li>
-                <a
-                  href="#"
-                  className="ms-0 flex h-8 items-center justify-center rounded-s-lg border border-e-0 border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  <span className="sr-only">Previous</span>
-                  <svg
-                    className="h-4 w-4 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m15 19-7-7 7-7"
-                    />
-                  </svg>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  1
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  2
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  aria-current="page"
-                  className="z-10 flex h-8 items-center justify-center border border-primary-300 bg-primary-50 px-3 leading-tight text-primary-600 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                >
-                  3
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  ...
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  100
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  <span className="sr-only">Next</span>
-                  <svg
-                    className="h-4 w-4 rtl:rotate-180"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m9 5 7 7-7 7"
-                    />
-                  </svg>
-                </a>
-              </li>
+              {/* Pagination code can go here if needed */}
             </ul>
           </nav>
         </div>
@@ -291,48 +195,10 @@ const OrderItem = ({ orderId, date, price, status, statusColor }) => (
 );
 
 const StatusIcon = ({ status }) => {
+  let icon;
+
   switch (status) {
-    case "Pre-order":
-      return (
-        <svg
-          className="me-1 h-3 w-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M18.5 4h-13m13 16h-13M8 20v-3.333a2 2 0 0 1 .4-1.2L10 12.6a1 1 0 0 0 0-1.2L8.4 8.533a2 2 0 0 1-.4-1.2V4h8v3.333a2 2 0 0 1-.4 1.2L13.957 11.4a1 1 0 0 0 0 1.2l1.643 2.867a2 2 0 0 1 .4 1.2V20H8Z"
-          />
-        </svg>
-      );
-    case "In transit":
-      return (
-        <svg
-          className="me-1 h-3 w-3"
-          aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-          />
-        </svg>
-      );
-    case "Confirmed":
+    case "Delivered":
       return (
         <svg
           className="me-1 h-3 w-3"
@@ -372,8 +238,62 @@ const StatusIcon = ({ status }) => {
           />
         </svg>
       );
+    case "In-transit":
+      return (
+        <svg
+          className="me-1 h-3 w-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+          />
+        </svg>
+      );
+    case "Pending":
+      return (
+        <svg
+          className="me-1 h-3 w-3"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M18.5 4h-13m13 16h-13M8 20v-3.333a2 2 0 0 1 .4-1.2L10 12.6a1 1 0 0 0 0-1.2L8.4 8.533a2 2 0 0 1-.4-1.2V4h8v3.333a2 2 0 0 1-.4 1.2L13.957 11.4a1 1 0 0 0 0 1.2l1.643 2.867a2 2 0 0 1 .4 1.2V20H8Z"
+          />
+        </svg>
+      );
     default:
-      return null;
+      icon = "help";
+  }
+};
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Delivered":
+      return "green";
+    case "Cancelled":
+      return "red";
+    case "In-transit":
+      return "blue";
+    case "Pending":
+      return "yellow";
+    default:
+      return "gray";
   }
 };
 

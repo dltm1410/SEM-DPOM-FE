@@ -1,0 +1,27 @@
+[
+  {
+    "gName": "Product A",
+    "price": 29.99,
+    "quantity": 100
+  },
+  {
+    "gName": "Product B",
+    "price": 49.99,
+    "quantity": 200
+  },
+  {
+    "gName": "Product C",
+    "price": 15.5,
+    "quantity": 150
+  },
+  {
+    "gName": "Product D",
+    "price": 99.99,
+    "quantity": 50
+  },
+  {
+    "gName": "Product E",
+    "price": 19.99,
+    "quantity": 75
+  }
+]

@@ -245,12 +245,14 @@ const Cart = () => {
                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                   or
                 </span>
-                <a
-                  href="#"
+                <Link
+                  to="/"
+                  title=""
                   className="inline-flex items-center gap-2 text-sm font-medium text-primary-700 underline hover:no-underline dark:text-primary-500"
+                  role="button"
                 >
                   Continue Shopping
-                </a>
+                </Link>
               </div>
             </div>
           </div>

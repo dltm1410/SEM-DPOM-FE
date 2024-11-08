@@ -7,7 +7,7 @@ import Cart from "./components/Cart";
 import Orders from "./components/Orders";
 import ConfirmOrder from "./components/ConfirmOrder";
 import OrderSummary from "./components/OrderSummary";
-
+import ProductDetail from "./components/ProductDetail";
 function App() {
   return (
     <Router>
@@ -18,6 +18,7 @@ function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/confirm-order" element={<ConfirmOrder />} />
         <Route path="/order-summary" element={<OrderSummary />} />
+        <Route path="/product-detail" element={<ProductDetail />} />
       </Routes>
       <Footer />
     </Router>

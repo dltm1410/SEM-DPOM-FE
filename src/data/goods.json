@@ -1,0 +1,37 @@
+[
+  {
+    "gID": 1,
+    "gName": "T-Shirt",
+    "price": 199.99,
+    "quantity": 50,
+    "color": "Red"
+  },
+  {
+    "gID": 2,
+    "gName": "Jeans",
+    "price": 499.99,
+    "quantity": 30,
+    "color": "Blue"
+  },
+  {
+    "gID": 3,
+    "gName": "Sneakers",
+    "price": 899.99,
+    "quantity": 20,
+    "color": "Black"
+  },
+  {
+    "gID": 4,
+    "gName": "Jacket",
+    "price": 799.99,
+    "quantity": 15,
+    "color": "Green"
+  },
+  {
+    "gID": 5,
+    "gName": "Hat",
+    "price": 99.99,
+    "quantity": 100,
+    "color": "Yellow"
+  }
+]

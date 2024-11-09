@@ -5,24 +5,32 @@ import cart from "../data/cart.json";
 function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartRef = useRef(null);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const accountRef = useRef(null);
 
   const toggleCart = () => {
-    console.log("Giỏ hàng đã được mở/đóng!");
     setIsCartOpen((prev) => !prev);
+    setIsAccountOpen(false);
   };
 
-  const [isAccountOpen, setIsAccountOpen] = useState(false);
-
   const toggleAccount = () => {
-    console.log("Account đã được mở/đóng!");
     setIsAccountOpen((prev) => !prev);
+    setIsCartOpen(false);
   };
 
   const handleClickOutside = (event) => {
-    if (cartRef.current && !cartRef.current.contains(event.target)) {
+    if (
+      cartRef.current &&
+      !cartRef.current.contains(event.target) &&
+      !event.target.closest("#myCartDropdownButton1")
+    ) {
       setIsCartOpen(false);
     }
-    if (isAccountOpen && event.target.closest("#userDropdown1") === null) {
+    if (
+      accountRef.current &&
+      !accountRef.current.contains(event.target) &&
+      !event.target.closest("#userDropdownButton1")
+    ) {
       setIsAccountOpen(false);
     }
   };
@@ -262,18 +270,22 @@ function Navbar() {
             </button>
             {isAccountOpen && (
               <div
+                ref={accountRef}
                 id="userDropdown1"
-                className="absolute top-10 z-10 ${isAccountOpen ? 'hidden' : ''} w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"
+                className="absolute top-10 z-10 w-56 divide-y divide-gray-100 overflow-hidden overflow-y-auto rounded-lg bg-white antialiased shadow dark:divide-gray-600 dark:bg-gray-700"
               >
                 <ul className="p-2 text-start text-sm font-medium text-gray-900 dark:text-white">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      to="/account"
                       title=""
                       className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => {
+                        setIsAccountOpen(false);
+                      }}
                     >
                       My Account
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <Link

@@ -13,7 +13,7 @@ const Footer = () => {
                 alt="FlowBite Logo"
               />
               <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
-                Flowbite
+                DERIT
               </span>
             </a>
           </div>
@@ -25,7 +25,7 @@ const Footer = () => {
               <ul class="text-gray-600 dark:text-gray-400">
                 <li class="mb-4">
                   <a href="https://flowbite.com" class="hover:underline">
-                    Flowbite
+                    DERIT
                   </a>
                 </li>
                 <li>
@@ -82,7 +82,7 @@ const Footer = () => {
           <span class="text-sm text-gray-500 dark:text-gray-400 sm:text-center">
             © 2022{" "}
             <a href="https://flowbite.com" class="hover:underline">
-              Flowbite™
+              DERIT™
             </a>
             . All Rights Reserved.
           </span>

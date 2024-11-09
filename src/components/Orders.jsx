@@ -3,7 +3,7 @@ import orders from "../data/order.json"; // Assuming your order data is in this 
 
 const Orders = () => {
   const [orderType, setOrderType] = useState("All orders");
-  const [duration, setDuration] = useState("this week");
+  const [duration, setDuration] = useState("all time");
 
   const filteredOrders = orders.filter((order) => {
     // Filter based on selected order type

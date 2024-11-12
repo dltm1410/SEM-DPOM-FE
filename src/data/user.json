@@ -1,0 +1,122 @@
+[
+  {
+    "userID": 1,
+    "username": "john_doe",
+    "role": "manager",
+    "password": "pass123",
+    "firstname": "John",
+    "lastname": "Doe",
+    "mail": "john.doe@example.com",
+    "gender": "male",
+    "address": "123 Main St, City, Country",
+    "phonenumber": "1234567890"
+  },
+  {
+    "userID": 2,
+    "username": "jane_smith",
+    "role": "customer",
+    "password": "secret456",
+    "firstname": "Jane",
+    "lastname": "Smith",
+    "mail": "jane.smith@example.com",
+    "gender": "female",
+    "address": "456 Elm St, City, Country",
+    "phonenumber": "0987654321"
+  },
+  {
+    "userID": 3,
+    "username": "michael_brown",
+    "role": "staff",
+    "password": "password789",
+    "firstname": "Michael",
+    "lastname": "Brown",
+    "mail": "michael.brown@example.com",
+    "gender": "male",
+    "address": "789 Oak St, City, Country",
+    "phonenumber": "1122334455"
+  },
+  {
+    "userID": 4,
+    "username": "susan_wilson",
+    "role": "staff",
+    "password": "qwerty123",
+    "firstname": "Susan",
+    "lastname": "Wilson",
+    "mail": "susan.wilson@example.com",
+    "gender": "female",
+    "address": "321 Pine St, City, Country",
+    "phonenumber": "2233445566"
+  },
+  {
+    "userID": 5,
+    "username": "david_jones",
+    "role": "customer",
+    "password": "abc123456",
+    "firstname": "David",
+    "lastname": "Jones",
+    "mail": "david.jones@example.com",
+    "gender": "male",
+    "address": "654 Maple St, City, Country",
+    "phonenumber": "3344556677"
+  },
+  {
+    "userID": 6,
+    "username": "emma_davis",
+    "role": "customer",
+    "password": "mypassword",
+    "firstname": "Emma",
+    "lastname": "Davis",
+    "mail": "emma.davis@example.com",
+    "gender": "female",
+    "address": "789 Birch St, City, Country",
+    "phonenumber": "4455667788"
+  },
+  {
+    "userID": 7,
+    "username": "chris_white",
+    "role": "staff",
+    "password": "passphrase123",
+    "firstname": "Chris",
+    "lastname": "White",
+    "mail": "chris.white@example.com",
+    "gender": "male",
+    "address": "159 Cedar St, City, Country",
+    "phonenumber": "5566778899"
+  },
+  {
+    "userID": 8,
+    "username": "lisa_clark",
+    "role": "customer",
+    "password": "12345lisa",
+    "firstname": "Lisa",
+    "lastname": "Clark",
+    "mail": "lisa.clark@example.com",
+    "gender": "female",
+    "address": "951 Spruce St, City, Country",
+    "phonenumber": "6677889900"
+  },
+  {
+    "userID": 9,
+    "username": "tom_harris",
+    "role": "staff",
+    "password": "tom12345",
+    "firstname": "Tom",
+    "lastname": "Harris",
+    "mail": "tom.harris@example.com",
+    "gender": "male",
+    "address": "753 Willow St, City, Country",
+    "phonenumber": "7788990011"
+  },
+  {
+    "userID": 10,
+    "username": "nina_roberts",
+    "role": "customer",
+    "password": "nina789",
+    "firstname": "Nina",
+    "lastname": "Roberts",
+    "mail": "nina.roberts@example.com",
+    "gender": "female",
+    "address": "357 Fir St, City, Country",
+    "phonenumber": "8899001122"
+  }
+]

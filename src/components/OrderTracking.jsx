@@ -28,7 +28,7 @@ function OrderTracking() {
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            animation: moveToInTransit 12s linear infinite;
+            animation: moveToInTransit 3s linear infinite;
           }
           .truck-animation {
             position: absolute;

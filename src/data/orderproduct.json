@@ -1,0 +1,102 @@
+[
+  {
+    "orderproductID": 1,
+    "price": 100,
+    "productID": 101,
+    "supplierID": 201,
+    "warehouseID": 301,
+    "quantity": 5,
+    "total": 500,
+    "status": "delivered"
+  },
+  {
+    "orderproductID": 2,
+    "price": 200,
+    "productID": 102,
+    "supplierID": 202,
+    "warehouseID": 302,
+    "quantity": 2,
+    "total": 400,
+    "status": "in-transit"
+  },
+  {
+    "orderproductID": 3,
+    "price": 150,
+    "productID": 103,
+    "supplierID": 203,
+    "warehouseID": 303,
+    "quantity": 3,
+    "total": 450,
+    "status": "cancel"
+  },
+  {
+    "orderproductID": 4,
+    "price": 120,
+    "productID": 104,
+    "supplierID": 204,
+    "warehouseID": 304,
+    "quantity": 4,
+    "total": 480,
+    "status": "delivered"
+  },
+  {
+    "orderproductID": 5,
+    "price": 90,
+    "productID": 105,
+    "supplierID": 205,
+    "warehouseID": 305,
+    "quantity": 6,
+    "total": 540,
+    "status": "in-transit"
+  },
+  {
+    "orderproductID": 6,
+    "price": 130,
+    "productID": 106,
+    "supplierID": 206,
+    "warehouseID": 306,
+    "quantity": 7,
+    "total": 910,
+    "status": "delivered"
+  },
+  {
+    "orderproductID": 7,
+    "price": 110,
+    "productID": 107,
+    "supplierID": 207,
+    "warehouseID": 307,
+    "quantity": 8,
+    "total": 880,
+    "status": "cancel"
+  },
+  {
+    "orderproductID": 8,
+    "price": 80,
+    "productID": 108,
+    "supplierID": 208,
+    "warehouseID": 308,
+    "quantity": 9,
+    "total": 720,
+    "status": "in-transit"
+  },
+  {
+    "orderproductID": 9,
+    "price": 140,
+    "productID": 109,
+    "supplierID": 209,
+    "warehouseID": 309,
+    "quantity": 10,
+    "total": 1400,
+    "status": "delivered"
+  },
+  {
+    "orderproductID": 10,
+    "price": 95,
+    "productID": 110,
+    "supplierID": 210,
+    "warehouseID": 310,
+    "quantity": 5,
+    "total": 475,
+    "status": "in-transit"
+  }
+]

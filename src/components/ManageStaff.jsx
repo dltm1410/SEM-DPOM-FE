@@ -40,7 +40,7 @@ const ManageStaff = () => {
         {/* Table section */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <thead className="text-base font-medium text-gray-500 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-4 py-3">
                   Staff ID
@@ -64,7 +64,10 @@ const ManageStaff = () => {
             </thead>
             <tbody>
               {staffUsers.map((staff) => (
-                <tr key={staff.uID} className="border-b dark:border-gray-700">
+                <tr
+                  key={staff.uID}
+                  className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white"
+                >
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     #{staff.userID}
                   </td>

@@ -216,7 +216,7 @@ function Navbar() {
                 <Link
                   to="/cart" // Đường dẫn đến trang giỏ hàng
                   title=""
-                  className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-black focus:outline-none focus:ring-4"
+                  className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4"
                   role="button"
                   onClick={() => {
                     setIsCartOpen(false); // Đóng giỏ hàng

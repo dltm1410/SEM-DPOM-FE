@@ -15,7 +15,7 @@ const OrderProduct = () => {
       <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
         <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
           <div className="w-full md:w-1/2">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               Track Orders
             </h2>
           </div>
@@ -23,24 +23,24 @@ const OrderProduct = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <thead className="text-base font-medium text-gray-500 dark:text-gray-400">
               <tr>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4 font-medium">
                   Order ID
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4 font-medium">
                   Order Date
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4 font-medium">
                   Total
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4 font-medium">
                   Quantity
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4 font-medium">
                   Status
                 </th>
-                <th scope="col" className="px-4 py-3">
+                <th scope="col" className="px-4 py-4">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
@@ -49,7 +49,7 @@ const OrderProduct = () => {
               {orderProducts.map((order) => (
                 <tr
                   key={order.orderproductID}
-                  className="border-b dark:border-gray-700"
+                  className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white"
                 >
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     #{order.orderproductID}

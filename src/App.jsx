@@ -17,29 +17,28 @@ import Signin from "./components/Signin";
 import ProcessOrder from "./components/ProcessOrder";
 function App() {
   return (
-    // <Router>
-    //   <Navbar />
-    //   <Routes>
-    //     <Route path="/manage-product" element={<ManageProduct />} />
-    //     <Route path="/" element={<Body />} />
-    //     <Route path="/cart" element={<Cart />} />
-    //     <Route path="/orders" element={<Orders />} />
-    //     <Route path="/confirm-order" element={<ConfirmOrder />} />
-    //     <Route path="/order-summary" element={<OrderSummary />} />
-    //     <Route path="/product-detail" element={<ProductDetail />} />
-    //     <Route path="/order-tracking" element={<OrderTracking />} />
-    //     <Route path="/account" element={<Account />} />
-    //   </Routes>
-    //   <Footer />
-    // </Router>
     <Router>
+      <Navbar />
       <Routes>
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/process-order" element={<ProcessOrder />} />
+        <Route path="/manage-product" element={<ManageProduct />} />
+        <Route path="/" element={<Body />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/confirm-order" element={<ConfirmOrder />} />
+        <Route path="/order-summary" element={<OrderSummary />} />
+        <Route path="/product-detail" element={<ProductDetail />} />
+        <Route path="/order-tracking" element={<OrderTracking />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
+      <Footer />
     </Router>
+    // <Router>
+    //   <Routes>
+    //     <Route path="/staff" element={<Staff />} />
+    //     <Route path="/signup" element={<Signup />} />
+    //     <Route path="/signin" element={<Signin />} />
+    //   </Routes>
+    // </Router>
   );
 }
 

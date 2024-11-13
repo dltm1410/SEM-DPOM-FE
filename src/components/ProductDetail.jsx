@@ -1,6 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 
 const ProductDetail = () => {
+  const [quantity, setQuantity] = useState(1);
+
+  const decreaseQuantity = () => {
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const increaseQuantity = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value) || 1;
+    setQuantity(Math.max(1, value));
+  };
+
   return (
     <section className="py-8 bg-white md:py-16 dark:bg-gray-900 antialiased">
       <div className="max-w-screen-xl px-4 mx-auto 2xl:px-0">
@@ -114,6 +129,71 @@ const ProductDetail = () => {
             </div>
 
             <hr className="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
+
+            {/* Size Selection */}
+            <div className="mb-6">
+              <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-white">
+                Size
+              </h3>
+              <div className="flex gap-2">
+                {["S", "M", "L", "XL", "2XL"].map((size) => (
+                  <button
+                    key={size}
+                    className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-primary-700 focus:text-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Color Selection */}
+            <div className="mb-6">
+              <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-white">
+                Color
+              </h3>
+              <div className="flex gap-2">
+                {[
+                  { name: "Trắng", class: "bg-white" },
+                  { name: "Đen", class: "bg-gray-900" },
+                  { name: "Xanh", class: "bg-blue-600" },
+                  { name: "Đỏ", class: "bg-red-600" },
+                ].map((color) => (
+                  <button
+                    key={color.name}
+                    className={`w-8 h-8 rounded-full border border-gray-200 ${color.class} hover:ring-2 hover:ring-primary-700 focus:ring-2 focus:ring-primary-700`}
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity Selection */}
+            <div className="mb-6">
+              <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-white">
+                Số lượng
+              </h3>
+              <div className="flex items-center">
+                <button
+                  onClick={decreaseQuantity}
+                  className="px-3 py-1 text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:ring-2 focus:ring-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  className="w-16 px-3 py-1 text-center text-gray-900 bg-white border-y border-gray-200 focus:ring-0 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600"
+                />
+                <button
+                  onClick={increaseQuantity}
+                  className="px-3 py-1 text-gray-900 bg-white border border-gray-200 rounded-r-lg hover:bg-gray-100 focus:ring-2 focus:ring-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700"
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
             <p className="mb-6 text-gray-500 dark:text-gray-400">
               Studio quality three mic array for crystal clear calls and voice

@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Body from "./components/Body";
@@ -29,16 +28,13 @@ function App() {
         <Route path="/product-detail" element={<ProductDetail />} />
         <Route path="/order-tracking" element={<OrderTracking />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/staff" element={<Staff />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/process" element={<ProcessOrder />} />
       </Routes>
       <Footer />
     </Router>
-    // <Router>
-    //   <Routes>
-    //     <Route path="/staff" element={<Staff />} />
-    //     <Route path="/signup" element={<Signup />} />
-    //     <Route path="/signin" element={<Signin />} />
-    //   </Routes>
-    // </Router>
   );
 }
 

@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import cart from "../data/cart.json";
-
+const formatVND = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
 function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const cartRef = useRef(null);
@@ -49,16 +54,11 @@ function Navbar() {
           <div className="flex items-center space-x-8">
             <div className="shrink-0">
               <a href="#" title="" className="">
-                <img
-                  className="block h-8 w-auto dark:hidden"
-                  src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/logo-full.svg"
-                  alt=""
-                />
-                <img
-                  className="hidden h-8 w-auto dark:block"
-                  src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/logo-full-dark.svg"
-                  alt=""
-                />
+                <a href="#" title="" className="text-2xl font-bold">
+                  <span className="block dark:hidden text-gray-900">
+                    ODINARI
+                  </span>
+                </a>
               </a>
             </div>
 
@@ -168,10 +168,10 @@ function Navbar() {
                         href="#"
                         className="truncate text-sm font-semibold leading-none text-gray-900 hover:underline dark:text-white"
                       >
-                        {item.gName}
+                        {item.name}
                       </a>
                       <p className="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">
-                        ${item.price}
+                        {formatVND(item.price)}
                       </p>
                     </div>
 
@@ -390,36 +390,36 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="hover:text-primary-700 dark:hover:text-primary-500"
               >
                 Best Sellers
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="hover:text-primary-700 dark:hover:text-primary-500"
               >
                 Gift Ideas
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to="#"
                 className="hover:text-primary-700 dark:hover:text-primary-500"
               >
                 Games
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="hover:text-primary-700 dark:hover:text-primary-500"
               >
                 Electronics
-              </a>
+              </Link>
             </li>
             <li>
               <a

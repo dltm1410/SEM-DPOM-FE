@@ -7,13 +7,8 @@ const Footer = () => {
         <div class="md:flex md:justify-between">
           <div class="mb-6 md:mb-0">
             <a href="https://flowbite.com" class="flex items-center">
-              <img
-                src="https://flowbite.com/docs/images/logo.svg"
-                class="mr-3 h-8"
-                alt="FlowBite Logo"
-              />
               <span class="self-center whitespace-nowrap text-2xl font-semibold dark:text-white">
-                DERIT
+                ODINARI
               </span>
             </a>
           </div>
@@ -25,12 +20,7 @@ const Footer = () => {
               <ul class="text-gray-600 dark:text-gray-400">
                 <li class="mb-4">
                   <a href="https://flowbite.com" class="hover:underline">
-                    DERIT
-                  </a>
-                </li>
-                <li>
-                  <a href="https://tailwindcss.com/" class="hover:underline">
-                    Tailwind CSS
+                    ODINARI
                   </a>
                 </li>
               </ul>
@@ -82,7 +72,7 @@ const Footer = () => {
           <span class="text-sm text-gray-500 dark:text-gray-400 sm:text-center">
             © 2022{" "}
             <a href="https://flowbite.com" class="hover:underline">
-              DERIT™
+              ODINARI™
             </a>
             . All Rights Reserved.
           </span>

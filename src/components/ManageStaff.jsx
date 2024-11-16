@@ -1,10 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import users from "../data/user.json";
+import axios from "axios";
 
 const ManageStaff = () => {
-  // Lọc users có role là staff
-  const staffUsers = users.filter((user) => user.role === "staff");
+  const [staffUsers, setStaffUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchStaffUsers = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/users/staff"
+        );
+        console.log(response.data);
+        const staffData = response.data.filter((user) => user.role === "staff");
+        setStaffUsers(staffData);
+        console.log(staffData);
+        setLoading(false);
+      } catch (err) {
+        setError("Có lỗi xảy ra khi tải dữ liệu nhân viên");
+        setLoading(false);
+        console.error("Error fetching staff data:", err);
+      }
+    };
+
+    fetchStaffUsers();
+  }, []);
+
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
   return (
     <div className="px-4 mx-auto max-w-screen-2xl lg:px-12">
       {/* Header section */}

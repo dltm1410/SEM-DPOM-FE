@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+const formatVND = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
 
 const ManageProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -165,16 +171,11 @@ const ManageProduct = () => {
                     scope="row"
                     className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                   >
-                    <img
-                      src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png"
-                      alt="iMac Front"
-                      className="w-auto h-8 mr-3"
-                    />
-                    Apple iMac 27&#34;
+                    Áo Hoddie
                   </th>
                   <td className="px-4 py-2">
                     <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
-                      Desktop PC
+                      Clothing
                     </span>
                   </td>
                   <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">

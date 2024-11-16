@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import goods from "../data/goods.json";
 import { Link } from "react-router-dom";
-
+const formatVND = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
 const Body = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -250,8 +255,8 @@ const Body = () => {
                 </ul>
 
                 <div class="mt-4 flex items-center justify-between gap-4">
-                  <p class="text-2xl font-extrabold leading-tight text-gray-900 dark:text-white">
-                    ${item.price}
+                  <p class="text-xl font-extrabold leading-tight text-gray-900 dark:text-white">
+                    {formatVND(item.price)}
                   </p>
 
                   <button

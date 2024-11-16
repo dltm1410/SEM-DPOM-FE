@@ -1,27 +1,37 @@
 [
   {
-    "gName": "Product A",
-    "price": 29.99,
-    "quantity": 100
+    "name": "Áo thun nam",
+    "price": 150000,
+    "quantity": 2,
+    "size": "L",
+    "color": "Trắng"
   },
   {
-    "gName": "Product B",
-    "price": 49.99,
-    "quantity": 200
+    "name": "Quần jean nữ",
+    "price": 850000,
+    "quantity": 1,
+    "size": "M",
+    "color": "Xanh đậm"
   },
   {
-    "gName": "Product C",
-    "price": 15.5,
-    "quantity": 150
+    "name": "Áo sơ mi trắng",
+    "price": 450000,
+    "quantity": 1,
+    "size": "XL",
+    "color": "Trắng"
   },
   {
-    "gName": "Product D",
-    "price": 99.99,
-    "quantity": 50
+    "name": "Váy dài mùa hè",
+    "price": 650000,
+    "quantity": 1,
+    "size": "S",
+    "color": "Hồng"
   },
   {
-    "gName": "Product E",
-    "price": 19.99,
-    "quantity": 75
+    "name": "Áo hoodie",
+    "price": 550000,
+    "quantity": 2,
+    "size": "L",
+    "color": "Đen"
   }
 ]

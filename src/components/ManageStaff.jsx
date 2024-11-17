@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { axiosInstance } from "../api/axios";
 
 const ManageStaff = () => {
   const [staffUsers, setStaffUsers] = useState([]);
@@ -9,9 +9,7 @@ const ManageStaff = () => {
   useEffect(() => {
     const fetchStaffUsers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/v1/users/staff"
-        );
+        const response = await axiosInstance.get("/users/staff");
         console.log(response.data);
         const staffData = response.data.users;
         setStaffUsers(staffData);

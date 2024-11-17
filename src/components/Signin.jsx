@@ -1,8 +1,43 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Signup from "./Signup";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { axiosInstance } from "../api/axios";
+import { toast } from "react-toastify";
 
 const Signin = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.post("/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
+
+      // Lưu token vào localStorage
+      localStorage.setItem("token", response.data.accessToken);
+
+      // Thông báo thành công
+      toast.success("Đăng nhập thành công!");
+
+      // Chuyển hướng về trang chủ
+      navigate("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -16,7 +51,10 @@ const Signin = () => {
               Sign in to your account
             </h1>
 
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form
+              className="space-y-4 md:space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div>
                 <label
                   htmlFor="email"
@@ -26,12 +64,23 @@ const Signin = () => {
                 </label>
                 <input
                   type="email"
-                  name="email"
-                  id="email"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  className={`bg-gray-50 border ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  } text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   placeholder="name@gmail.com"
-                  required
                 />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -43,30 +92,36 @@ const Signin = () => {
                 </label>
                 <input
                   type="password"
-                  name="password"
-                  id="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                  className={`bg-gray-50 border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
                 />
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
-                      id="remember"
-                      aria-describedby="remember"
                       type="checkbox"
+                      {...register("remember")}
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                      required
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="remember"
-                      className="text-gray-500 dark:text-gray-300"
-                    >
+                    <label className="text-gray-500 dark:text-gray-300">
                       Remember me
                     </label>
                   </div>
@@ -81,9 +136,10 @@ const Signin = () => {
 
               <button
                 type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                disabled={isLoading}
+                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 disabled:opacity-50"
               >
-                Sign in
+                {isLoading ? "Signing in..." : "Sign in"}
               </button>
 
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">

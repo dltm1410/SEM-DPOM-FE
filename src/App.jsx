@@ -26,7 +26,7 @@ function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/confirm-order" element={<ConfirmOrder />} />
         <Route path="/order-summary" element={<OrderSummary />} />
-        <Route path="/product-detail" element={<ProductDetail />} />
+        <Route path="/product-detail/:id" element={<ProductDetail />} />
         <Route path="/order-tracking" element={<OrderTracking />} />
         <Route path="/account" element={<Account />} />
         <Route path="/signin" element={<Signin />} />

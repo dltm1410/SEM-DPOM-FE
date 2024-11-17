@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import Signin from "./Signin";
+
 import cart from "../data/cart.json";
+
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -338,13 +341,13 @@ function Navbar() {
                 </ul>
 
                 <div className="p-2 text-sm font-medium text-gray-900 dark:text-white">
-                  <a
-                    href="#"
+                  <Link
+                    to="/signin"
                     title=""
                     className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                   >
                     Sign Out
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}

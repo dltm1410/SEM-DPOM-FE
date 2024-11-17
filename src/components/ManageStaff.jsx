@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import users from "../data/user.json";
 import axios from "axios";
 
 const ManageStaff = () => {
@@ -11,10 +10,10 @@ const ManageStaff = () => {
     const fetchStaffUsers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/users/staff"
+          "http://localhost:5000/api/v1/users/staff"
         );
         console.log(response.data);
-        const staffData = response.data.filter((user) => user.role === "staff");
+        const staffData = response.data.users;
         setStaffUsers(staffData);
         console.log(staffData);
         setLoading(false);
@@ -96,11 +95,9 @@ const ManageStaff = () => {
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     #{staff.userID}
                   </td>
-                  <td className="px-4 py-3">
-                    {staff.firstname} {staff.lastname}
-                  </td>
-                  <td className="px-4 py-3">{staff.mail}</td>
-                  <td className="px-4 py-3">{staff.phonenumber}</td>
+                  <td className="px-4 py-3">{staff.name}</td>
+                  <td className="px-4 py-3">{staff.email}</td>
+                  <td className="px-4 py-3">{staff.phoneNumber}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`bg-${

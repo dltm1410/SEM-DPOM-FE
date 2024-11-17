@@ -1,18 +1,63 @@
-import React, { useState } from "react";
-import goods from "../data/goods.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
+
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   }).format(amount);
 };
-const Body = () => {
-  const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredGoods = goods.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+const Body = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchProducts = async (pageNum, query) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:5000/api/v1/products?page=${pageNum}&search=${query}`
+      );
+
+      if (pageNum === 1) {
+        setProducts(response.data.products);
+      } else {
+        setProducts((prev) => [...prev, ...response.data.products]);
+      }
+
+      setHasMore(response.data.hasMore);
+      setLoading(false);
+    } catch (err) {
+      setError("Có lỗi xảy ra khi tải dữ liệu sản phẩm");
+      setLoading(false);
+      console.error("Error fetching products:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(page, searchQuery);
+  }, [page]);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (page === 1) {
+        fetchProducts(1, searchQuery);
+      } else {
+        setPage(1); // Reset về trang 1 khi search
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const handleShowMore = () => {
+    setPage((prev) => prev + 1);
+  };
 
   return (
     <section className="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
@@ -48,29 +93,35 @@ const Body = () => {
         </div>
 
         <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredGoods.map((item, index) => (
+          {products.map((product) => (
             <div
-              key={index}
+              key={product.productID}
               className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="h-56 w-full">
-                <a href="/product-detail">
+                <Link to={`/product-detail/${product.productID}`}>
                   <img
                     className="mx-auto h-full dark:hidden"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-keyboard.svg"
-                    alt=""
+                    src={
+                      product.image ||
+                      "https://flowbite.s3.amazonaws.com/blocks/e-commerce/products/default.svg"
+                    }
+                    alt={product.name}
                   />
                   <img
                     className="mx-auto hidden h-full dark:block"
-                    src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/ipad-keyboard-dark.svg"
-                    alt=""
+                    src={
+                      product.image ||
+                      "https://flowbite.s3.amazonaws.com/blocks/e-commerce/products/default-dark.svg"
+                    }
+                    alt={product.name}
                   />
-                </a>
+                </Link>
               </div>
               <div className="pt-6">
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <span className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300 me-2 rounded px-2.5 py-0.5 text-xs font-medium">
-                    {item.season}
+                    {product.material}
                   </span>
 
                   <div className="flex items-center justify-end gap-1">
@@ -146,11 +197,10 @@ const Body = () => {
                 </div>
 
                 <Link
-                  to="/product-detail"
+                  to={`/product-detail/${product.productID}`}
                   className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
-                  class="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white"
                 >
-                  {item.name}
+                  {product.title}
                 </Link>
 
                 <div class="mt-2 flex items-center gap-2">
@@ -207,7 +257,7 @@ const Body = () => {
                   </div>
 
                   <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {item.rating}
+                    {product.rating}
                   </p>
                 </div>
 
@@ -256,27 +306,26 @@ const Body = () => {
 
                 <div class="mt-4 flex items-center justify-between gap-4">
                   <p class="text-xl font-extrabold leading-tight text-gray-900 dark:text-white">
-                    {formatVND(item.price)}
+                    {formatVND(product.price)}
                   </p>
 
                   <button
                     type="button"
+                    onClick={() => handleAddToCart(product.productID)}
                     class="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4"
                   >
                     <svg
                       class="-ms-2 me-2 h-5 w-5"
                       aria-hidden="true"
                       xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
                       fill="none"
                       viewBox="0 0 24 24"
                     >
                       <path
                         stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
                       />
                     </svg>
@@ -288,14 +337,29 @@ const Body = () => {
           ))}
         </div>
 
-        <div class="w-full text-center">
-          <button
-            type="button"
-            class="hover:text-primary-700 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-          >
-            Show more
-          </button>
-        </div>
+        {hasMore && !loading && (
+          <div className="w-full text-center">
+            <button
+              type="button"
+              onClick={handleShowMore}
+              className="hover:text-primary-700 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+            >
+              {loading ? "Đang tải..." : "Xem thêm"}
+            </button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="w-full text-center">
+            <p>Đang tải...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="w-full text-center text-red-500">
+            <p>{error}</p>
+          </div>
+        )}
       </div>
     </section>
   );

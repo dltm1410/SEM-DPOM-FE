@@ -13,7 +13,6 @@ import Staff from "./components/Staff";
 import Account from "./components/Account";
 import Signup from "./components/Signup";
 import Signin from "./components/Signin";
-import ProcessOrder from "./components/ProcessOrder";
 function App() {
   return (
     <Router>
@@ -31,7 +30,6 @@ function App() {
         <Route path="/staff" element={<Staff />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
-        <Route path="/process" element={<ProcessOrder />} />
       </Routes>
       <Footer />
     </Router>

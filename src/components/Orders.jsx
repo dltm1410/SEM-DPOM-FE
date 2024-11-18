@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import orders from "../data/order.json"; // Assuming your order data is in this path
-
+const formatVND = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    currencyDisplay: "code", // Thêm dòng này để hiển thị "VND"
+  })
+    .format(amount)
+    .replace("VND", " VND"); // Thêm khoảng trắng trước "VND"
+};
 const Orders = () => {
   const [orderType, setOrderType] = useState("All orders");
   const [duration, setDuration] = useState("all time");
@@ -163,7 +171,7 @@ const OrderItem = ({ orderId, date, price, status, statusColor }) => (
         Price:
       </dt>
       <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-        {price}
+        {formatVND(price)}
       </dd>
     </dl>
     <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
@@ -178,12 +186,26 @@ const OrderItem = ({ orderId, date, price, status, statusColor }) => (
       </dd>
     </dl>
     <div className="w-full grid sm:grid-cols-2 lg:flex lg:w-64 lg:items-center lg:justify-end gap-4">
-      <button
-        type="button"
-        className="w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300 dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto"
-      >
-        Cancel order
-      </button>
+      {status === "Delivered" ? (
+        <button
+          type="button"
+          className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:border-yellow-400 dark:text-yellow-400 dark:hover:bg-yellow-400 dark:hover:text-white dark:focus:ring-yellow-900 lg:w-auto"
+        >
+          Rating
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={status === "Cancelled"}
+          className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${
+            status === "Cancelled"
+              ? "cursor-not-allowed opacity-50"
+              : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
+          } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
+        >
+          Cancel order
+        </button>
+      )}
       <a
         href="#"
         className="w-full inline-flex justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto"

@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import orderProducts from "../data/orderproduct.json";
-
+const formatVND = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
 const OrderProduct = () => {
   const handleCancel = (orderId) => {
     console.log("Cancel order:", orderId);
@@ -58,7 +63,7 @@ const OrderProduct = () => {
                     {new Date().toLocaleDateString()}{" "}
                     {/* Thay bằng order.orderDate khi có data */}
                   </td>
-                  <td className="px-4 py-3">${order.total}</td>
+                  <td className="px-4 py-3">{formatVND(order.total)}</td>
                   <td className="px-4 py-3">{order.quantity}</td>
                   <td className="px-4 py-3">
                     <span

@@ -13,6 +13,7 @@ import Staff from "./components/Staff";
 import Account from "./components/Account";
 import Signup from "./components/Signup";
 import Signin from "./components/Signin";
+
 function App() {
   return (
     <Router>
@@ -24,15 +25,21 @@ function App() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/confirm-order" element={<ConfirmOrder />} />
         <Route path="/order-summary" element={<OrderSummary />} />
-        <Route path="/product-detail" element={<ProductDetail />} />
+        <Route path="/product-detail/:id" element={<ProductDetail />} />
         <Route path="/order-tracking" element={<OrderTracking />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/staff" element={<Staff />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
       <Footer />
     </Router>
+    // <Router>
+    //   <Routes>
+    //     <Route path="/staff" element={<Staff />} />
+    //     <Route path="/signup" element={<Signup />} />
+    //     <Route path="/signin" element={<Signin />} />
+    //   </Routes>
+    // </Router>
   );
 }
 

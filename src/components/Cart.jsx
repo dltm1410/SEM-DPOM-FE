@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import cartData from "../data/cart.json";
 
+import axiosInstance from "../api/axios";
 const Cart = () => {
   // Hàm format tiền VND
   const formatVND = (amount) => {
@@ -19,7 +20,31 @@ const Cart = () => {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+  const [cartData, setCartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        const response = await axiosInstance.get("/cart");
+        console.log(response.data);
+        const cartData = response.data.cart;
+        setCartData(cartData);
+        console.log(cartData);
+        setLoading(false);
+      } catch (err) {
+        setError("Có lỗi xảy ra khi tải dữ liệu giỏ hàng");
+        setLoading(false);
+        console.error("Error fetching cart data:", err);
+      }
+    };
+
+    fetchCartData();
+  }, []);
+
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">

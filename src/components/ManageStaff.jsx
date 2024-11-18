@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import users from "../data/user.json";
-import axios from "axios";
+import { axiosInstance } from "../api/axios";
 
 const ManageStaff = () => {
   const [staffUsers, setStaffUsers] = useState([]);
@@ -10,11 +9,9 @@ const ManageStaff = () => {
   useEffect(() => {
     const fetchStaffUsers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/v1/users/staff"
-        );
+        const response = await axiosInstance.get("/users/staff");
         console.log(response.data);
-        const staffData = response.data.users
+        const staffData = response.data.users;
         setStaffUsers(staffData);
         console.log(staffData);
         setLoading(false);
@@ -96,10 +93,8 @@ const ManageStaff = () => {
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     #{staff.userID}
                   </td>
-                  <td className="px-4 py-3">
-                    {staff.firstName} {staff.lastName}
-                  </td>
-                  <td className="px-4 py-3">{staff.mail}</td>
+                  <td className="px-4 py-3">{staff.name}</td>
+                  <td className="px-4 py-3">{staff.email}</td>
                   <td className="px-4 py-3">{staff.phoneNumber}</td>
                   <td className="px-4 py-3">
                     <span

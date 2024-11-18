@@ -1,17 +1,54 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import cart from "../data/cart.json";
+import { axiosInstance } from "../api/axios";
+import { toast } from "react-toastify";
+
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   }).format(amount);
 };
+
 function Navbar() {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const cartRef = useRef(null);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const accountRef = useRef(null);
+
+  // Fetch giỏ hàng từ API
+  const fetchCart = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosInstance.get("/cart");
+      setCartItems(response.data.items || []);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      toast.error("Error fetching cart");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Xóa sản phẩm khỏi giỏ hàng
+  const removeFromCart = async (productId) => {
+    try {
+      await axiosInstance.delete(`/cart/${productId}`);
+      toast.success("Deleted item from cart");
+      fetchCart(); // Tải lại giỏ hàng
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Error deleting item");
+    }
+  };
+
+  useEffect(() => {
+    if (isCartOpen) {
+      fetchCart();
+    }
+  }, [isCartOpen]);
 
   const toggleCart = () => {
     setIsCartOpen((prev) => !prev);
@@ -71,42 +108,6 @@ function Navbar() {
                   Home
                 </Link>
               </li>
-              <li className="shrink-0">
-                <a
-                  href="#"
-                  title=""
-                  className="hover:text-primary-700 dark:hover:text-primary-500 flex text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Best Sellers
-                </a>
-              </li>
-              <li className="shrink-0">
-                <a
-                  href="#"
-                  title=""
-                  className="hover:text-primary-700 dark:hover:text-primary-500 flex text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Gift Ideas
-                </a>
-              </li>
-              <li className="shrink-0">
-                <a
-                  href="#"
-                  title=""
-                  className="hover:text-primary-700 dark:hover:text-primary-500 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Today's Deals
-                </a>
-              </li>
-              <li className="shrink-0">
-                <a
-                  href="#"
-                  title=""
-                  className="hover:text-primary-700 dark:hover:text-primary-500 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Sell
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -159,71 +160,69 @@ function Navbar() {
               <div
                 ref={cartRef}
                 id="myCartDropdown1"
-                className="absolute right-10 top-10 z-10 mx-auto ${isCartOpen ? 'hidden' : ''} max-w-sm space-y-4 overflow-hidden rounded-lg bg-white p-4 antialiased shadow-lg dark:bg-gray-800"
+                className="absolute right-10 top-10 z-10 mx-auto max-w-sm space-y-4 overflow-hidden rounded-lg bg-white p-4 antialiased shadow-lg dark:bg-gray-800"
               >
-                {cart.map((item, index) => (
-                  <div key={index} className="grid grid-cols-2">
-                    <div>
-                      <a
-                        href="#"
-                        className="truncate text-sm font-semibold leading-none text-gray-900 hover:underline dark:text-white"
-                      >
-                        {item.name}
-                      </a>
-                      <p className="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">
-                        {formatVND(item.price)}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-end gap-6">
-                      <p className="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">
-                        Qty: {item.quantity}{" "}
-                        {/* Chỉnh sửa thành item.quantity nếu cần */}
-                      </p>
-
-                      <button
-                        data-tooltip-target={`tooltipRemoveItem${index}`} // Thay đổi ID động cho tooltip
-                        type="button"
-                        className="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600"
-                      >
-                        <span className="sr-only">Remove</span>
-                        <svg
-                          className="h-4 w-4"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3a1 1 0 0 0-1.4-1.4L12 10.6 9.7 8.3Z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                      <div
-                        id={`tooltipRemoveItem${index}`}
-                        role="tooltip"
-                        className="tooltip invisible absolute z-10 inline-block rounded-lg bg-gray-900 px-3 py-2 text-sm font-medium text-white opacity-0 shadow-sm transition-opacity duration-300 dark:bg-gray-700"
-                      >
-                        Remove item
-                        <div className="tooltip-arrow" data-popper-arrow></div>
-                      </div>
-                    </div>
+                {isLoading ? (
+                  <div className="flex justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                   </div>
-                ))}
+                ) : cartItems.length === 0 ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400">
+                    Cart is empty
+                  </p>
+                ) : (
+                  <>
+                    {cartItems.map((item) => (
+                      <div key={item.product._id} className="grid grid-cols-2">
+                        <div>
+                          <Link
+                            to={`/product/${item.productId}`}
+                            className="truncate text-sm font-semibold leading-none text-gray-900 hover:underline dark:text-white"
+                          >
+                            {item.product.title}
+                          </Link>
+                          <p className="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">
+                            {formatVND(item.product.price)}
+                          </p>
+                        </div>
 
-                <Link
-                  to="/cart" // Đường dẫn đến trang giỏ hàng
-                  title=""
-                  className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4"
-                  role="button"
-                  onClick={() => {
-                    setIsCartOpen(false); // Đóng giỏ hàng
-                  }}
-                >
-                  Proceed to Checkout
-                </Link>
+                        <div className="flex items-center justify-end gap-6">
+                          <p className="text-sm font-normal leading-none text-gray-500 dark:text-gray-400">
+                            Qty: {item.quantity}
+                          </p>
+
+                          <button
+                            onClick={() => removeFromCart(item.product._id)}
+                            className="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600"
+                          >
+                            <span className="sr-only">Remove</span>
+                            <svg
+                              className="h-4 w-4"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M2 12a10 10 0 1 1 20 0 10 10 0 0 1-20 0Zm7.7-3.7a1 1 0 0 0-1.4 1.4l2.3 2.3-2.3 2.3a1 1 0 1 0 1.4 1.4l2.3-2.3 2.3 2.3a1 1 0 0 0 1.4-1.4L13.4 12l2.3-2.3a1 1 0 0 0-1.4-1.4L12 10.6 9.7 8.3Z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <Link
+                      to="/cart"
+                      className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 mb-2 me-2 inline-flex w-full items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4"
+                      onClick={() => setIsCartOpen(false)}
+                    >
+                      Proceed to Checkout
+                    </Link>
+                  </>
+                )}
               </div>
             )}
 
@@ -338,13 +337,13 @@ function Navbar() {
                 </ul>
 
                 <div className="p-2 text-sm font-medium text-gray-900 dark:text-white">
-                  <a
-                    href="#"
+                  <Link
+                    to="/signin"
                     title=""
                     className="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
                   >
                     Sign Out
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}
@@ -388,46 +387,6 @@ function Navbar() {
               >
                 Home
               </Link>
-            </li>
-            <li>
-              <Link
-                to="#"
-                className="hover:text-primary-700 dark:hover:text-primary-500"
-              >
-                Best Sellers
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="#"
-                className="hover:text-primary-700 dark:hover:text-primary-500"
-              >
-                Gift Ideas
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="#"
-                className="hover:text-primary-700 dark:hover:text-primary-500"
-              >
-                Games
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="hover:text-primary-700 dark:hover:text-primary-500"
-              >
-                Electronics
-              </Link>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="hover:text-primary-700 dark:hover:text-primary-500"
-              >
-                Home & Garden
-              </a>
             </li>
           </ul>
         </div>

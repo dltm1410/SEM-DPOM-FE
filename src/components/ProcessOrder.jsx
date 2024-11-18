@@ -1,8 +1,28 @@
-import React from "react";
-import orders from "../data/order.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ProcessOrder = () => {
-  const pendingOrders = orders.filter((order) => order.status === "Pending");
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/orders/pending"
+      );
+      setPendingOrders(response.data.orders);
+      setLoading(false);
+    } catch (err) {
+      setError("Có lỗi xảy ra khi tải dữ liệu đơn hàng");
+      setLoading(false);
+      console.error("Error fetching orders data:", err);
+    }
+  };
 
   const handleAccept = (order) => {
     // Xử lý logic khi accept đơn hàng
@@ -18,6 +38,8 @@ const ProcessOrder = () => {
     // Xử lý logic khi xem chi tiết đơn hàng
     console.log("View detail order:", order.oID);
   };
+  if (loading) return <div>Đang tải...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-3 sm:py-5">

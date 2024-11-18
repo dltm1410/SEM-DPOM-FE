@@ -11,7 +11,7 @@ const formatVND = (amount) => {
 };
 
 // Tách thành component riêng để dễ quản lý
-const ProductCard = ({ product, onAddToCart, onProductClick }) => {
+const ProductCard = ({ product, onProductClick }) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       <div
@@ -142,11 +142,29 @@ const ProductCard = ({ product, onAddToCart, onProductClick }) => {
           </p>
           <button
             type="button"
-            onClick={() => onAddToCart(product._id)}
+            onClick={() => onProductClick(product._id)}
             className="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4"
           >
-            {/* Cart icon */}
-            Add to cart
+            <svg
+              className="mr-2 h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              />
+            </svg>
+            View Details
           </button>
         </div>
       </div>
@@ -156,87 +174,52 @@ const ProductCard = ({ product, onAddToCart, onProductClick }) => {
 
 const Body = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  // Gộp 2 hàm fetch và search thành 1
-  const fetchProducts = async (currentPage, query = "") => {
-    try {
-      setLoading(true);
-      const endpoint = query
-        ? `/products/search?q=${query}&page=${currentPage}`
-        : `/products?page=${currentPage}`;
-
-      const response = await axiosInstance.get(endpoint);
-
-      if (currentPage === 1) {
-        setProducts(response.data.products);
-      } else {
-        setProducts((prev) => [...prev, ...response.data.products]);
-      }
-
-      setHasMore(response.data.hasMore);
-    } catch (err) {
-      setError(
-        query
-          ? "Có lỗi xảy ra khi tìm kiếm sản phẩm"
-          : "Có lỗi xảy ra khi tải dữ liệu sản phẩm"
-      );
-      console.error("Error fetching products:", err);
-    } finally {
-      setLoading(false);
-    }
+  // Chỉ giữ lại hàm handleProductClick
+  const handleProductClick = (productId) => {
+    navigate(`/product-detail/${productId}`);
   };
 
-  // Load products khi page thay đổi
+  // Fetch tất cả sản phẩm lần đầu
   useEffect(() => {
-    fetchProducts(page, searchQuery);
-  }, [page]);
-
-  // Xử lý search với debounce
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      if (page === 1) {
-        fetchProducts(1, searchQuery);
-      } else {
-        setPage(1); // Reset về trang 1 khi search
+    const fetchAllProducts = async () => {
+      try {
+        const response = await axiosInstance.get("/products");
+        setAllProducts(response.data.products);
+        setFilteredProducts(response.data.products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setError("Error fetching products");
+      } finally {
+        setLoading(false);
       }
-    }, 500);
+    };
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery]);
+    fetchAllProducts();
+  }, []);
 
-  const handleShowMore = () => {
-    setPage((prev) => prev + 1);
-  };
+  // Hàm search local
+  const handleSearch = (e) => {
+    const query = e.target.value.trim().toLowerCase();
+    setSearchQuery(query);
 
-  const handleProductClick = async (productId) => {
-    try {
-      const response = await axiosInstance.get(`/products/${productId}`);
-      navigate(`/product-detail/${productId}`, {
-        state: { product: response.data },
-      });
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-      toast.error("Không thể tải thông tin sản phẩm");
+    if (query === "") {
+      setFilteredProducts(allProducts);
+      return;
     }
-  };
 
-  const handleAddToCart = async (productId) => {
-    try {
-      await axiosInstance.post("/cart/add", {
-        productId,
-        quantity: 1,
-      });
-      toast.success("Đã thêm vào giỏ hàng!");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Không thể thêm vào giỏ hàng");
-    }
+    const filtered = allProducts.filter((product) =>
+      product.title.toLowerCase().includes(query)
+    );
+
+    setFilteredProducts(filtered);
   };
 
   return (
@@ -247,65 +230,61 @@ const Body = () => {
           <div className="relative">
             <input
               type="text"
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-              placeholder="Search Product..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearch}
+              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-4 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+              placeholder="Search products..."
             />
-            <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-              <svg
-                className="h-4 w-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              onAddToCart={handleAddToCart}
-              onProductClick={handleProductClick}
-            />
-          ))}
-        </div>
-
-        {/* Load More Button */}
-        {hasMore && !loading && (
-          <div className="w-full text-center">
-            <button
-              type="button"
-              onClick={handleShowMore}
-              className="hover:text-primary-700 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
-            >
-              Xem thêm
-            </button>
-          </div>
+        {/* Hiển thị kết quả */}
+        {!loading && (
+          <>
+            {filteredProducts.length > 0 ? (
+              <div className="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    onProductClick={handleProductClick}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                    No products to display
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    {searchQuery
+                      ? `Cannot find product "${searchQuery}"`
+                      : "No products to display"}
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Loading & Error States */}
+        {/* Loading State */}
         {loading && (
           <div className="w-full text-center">
-            <p>Đang tải...</p>
-          </div>
-        )}
-        {error && (
-          <div className="w-full text-center text-red-500">
-            <p>{error}</p>
+            <p>Loading...</p>
           </div>
         )}
       </div>

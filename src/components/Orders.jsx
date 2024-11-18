@@ -1,17 +1,62 @@
-import React, { useState } from "react";
-import orders from "../data/order.json"; // Assuming your order data is in this path
+import React, { useState, useEffect } from "react";
+import { axiosInstance } from "../api/axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
-    currencyDisplay: "code", // Thêm dòng này để hiển thị "VND"
+    currencyDisplay: "code",
   })
     .format(amount)
-    .replace("VND", " VND"); // Thêm khoảng trắng trước "VND"
+    .replace("VND", " VND");
 };
+
 const Orders = () => {
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [orderType, setOrderType] = useState("All orders");
   const [duration, setDuration] = useState("all time");
+
+  // Fetch orders từ API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axiosInstance.get("/orders");
+        console.log("Raw API response:", response);
+        console.log("Orders data:", response.data);
+
+        // Đảm bảo response.data là một mảng
+        const ordersData = Array.isArray(response.data)
+          ? response.data
+          : response.data.orders || [];
+
+        console.log("Orders array:", ordersData);
+
+        // Map API data to match UI format
+        const formattedOrders = ordersData.map((order) => ({
+          oID: order.orderId,
+          createDate: new Date(order.orderDate).toLocaleDateString("vi-VN"),
+          totalPrice: order.total,
+          status: order.status || "Pending",
+        }));
+
+        console.log("Formatted orders:", formattedOrders);
+        setOrders(formattedOrders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        console.error("Error response:", error.response?.data);
+        toast.error("Không thể tải danh sách đơn hàng");
+        setOrders([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   const filteredOrders = orders.filter((order) => {
     // Filter based on selected order type
@@ -59,6 +104,16 @@ const Orders = () => {
     return typeMatch && dateMatch;
   });
 
+  // Render loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-700"></div>
+      </div>
+    );
+  }
+
+  // Giữ nguyên phần return của bạn
   return (
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
@@ -146,75 +201,89 @@ const Orders = () => {
   );
 };
 
-const OrderItem = ({ orderId, date, price, status, statusColor }) => (
-  <div className="flex flex-wrap items-center gap-y-4 py-6">
-    <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-      <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-        Order ID:
-      </dt>
-      <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-        <a href="#" className="hover:underline">
-          {orderId}
-        </a>
-      </dd>
-    </dl>
-    <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-      <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-        Date:
-      </dt>
-      <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-        {date}
-      </dd>
-    </dl>
-    <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-      <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-        Price:
-      </dt>
-      <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
-        {formatVND(price)}
-      </dd>
-    </dl>
-    <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
-      <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
-        Status:
-      </dt>
-      <dd
-        className={`me-2 mt-1.5 inline-flex items-center rounded bg-${statusColor}-100 px-2.5 py-0.5 text-xs font-medium text-${statusColor}-800 dark:bg-${statusColor}-900 dark:text-${statusColor}-300`}
-      >
-        <StatusIcon status={status} />
-        {status}
-      </dd>
-    </dl>
-    <div className="w-full grid sm:grid-cols-2 lg:flex lg:w-64 lg:items-center lg:justify-end gap-4">
-      {status === "Delivered" ? (
-        <button
-          type="button"
-          className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:border-yellow-400 dark:text-yellow-400 dark:hover:bg-yellow-400 dark:hover:text-white dark:focus:ring-yellow-900 lg:w-auto"
+const formatOrderId = (orderId) => {
+  if (!orderId) return "";
+
+  return orderId.length > 10 ? `${orderId.slice(0, 10)}...` : orderId;
+};
+
+const OrderItem = ({ orderId, date, price, status, statusColor }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="flex flex-wrap items-center gap-y-4 py-6">
+      <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
+        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+          Order ID:
+        </dt>
+        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+          <a
+            href="#"
+            className="hover:underline"
+            title={orderId} // Hiển thị full ID khi hover
+          >
+            #{formatOrderId(orderId)}
+          </a>
+        </dd>
+      </dl>
+      <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
+        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+          Date:
+        </dt>
+        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+          {date}
+        </dd>
+      </dl>
+      <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
+        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+          Price:
+        </dt>
+        <dd className="mt-1.5 text-base font-semibold text-gray-900 dark:text-white">
+          {formatVND(price)}
+        </dd>
+      </dl>
+      <dl className="w-1/2 sm:w-1/4 lg:w-auto lg:flex-1">
+        <dt className="text-base font-medium text-gray-500 dark:text-gray-400">
+          Status:
+        </dt>
+        <dd
+          className={`me-2 mt-1.5 inline-flex items-center rounded bg-${statusColor}-100 px-2.5 py-0.5 text-xs font-medium text-${statusColor}-800 dark:bg-${statusColor}-900 dark:text-${statusColor}-300`}
         >
-          Rating
-        </button>
-      ) : (
+          <StatusIcon status={status} />
+          {status}
+        </dd>
+      </dl>
+      <div className="w-full grid sm:grid-cols-2 lg:flex lg:w-64 lg:items-center lg:justify-end gap-4">
+        {status === "Delivered" ? (
+          <button
+            type="button"
+            className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:border-yellow-400 dark:text-yellow-400 dark:hover:bg-yellow-400 dark:hover:text-white dark:focus:ring-yellow-900 lg:w-auto"
+          >
+            Rating
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={status === "Cancelled"}
+            className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${
+              status === "Cancelled"
+                ? "cursor-not-allowed opacity-50"
+                : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
+            } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
+          >
+            Cancel order
+          </button>
+        )}
         <button
-          type="button"
-          disabled={status === "Cancelled"}
-          className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${
-            status === "Cancelled"
-              ? "cursor-not-allowed opacity-50"
-              : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
-          } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
+          onClick={() => navigate(`/order-tracking/${orderId}`)}
+          className="w-full inline-flex justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto"
         >
-          Cancel order
+          View details
         </button>
-      )}
-      <a
-        href="#"
-        className="w-full inline-flex justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 lg:w-auto"
-      >
-        View details
-      </a>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const StatusIcon = ({ status }) => {
   let icon;

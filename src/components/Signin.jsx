@@ -24,7 +24,7 @@ const Signin = () => {
 
       // Lưu token vào localStorage
       localStorage.setItem("token", response.data.accessToken);
-
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       // Thông báo thành công
       toast.success("Đăng nhập thành công!");
 

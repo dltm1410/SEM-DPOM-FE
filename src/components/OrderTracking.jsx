@@ -12,7 +12,7 @@ function OrderTracking() {
     const fetchOrderDetails = async () => {
       try {
         setIsLoading(true);
-        console.log(orderId)
+        console.log(orderId);
         const response = await axiosInstance.get(`/orders/id/${orderId}`);
 
         console.log("API Response:", response.data);
@@ -46,9 +46,7 @@ function OrderTracking() {
   if (!orderDetails) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500 dark:text-gray-400">
-          Không tìm thấy đơn hàng
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">Order not found</p>
       </div>
     );
   }
@@ -82,7 +80,10 @@ function OrderTracking() {
       <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
         <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-            Theo dõi đơn hàng #{orderDetails.orderId}
+            Theo dõi đơn hàng #{" "}
+            <span className="cursor-help" title={orderDetails.orderId}>
+              {orderDetails.orderId.substring(0, 10)}...
+            </span>
           </h2>
 
           <div className="mt-6 flex flex-col gap-8 sm:mt-8 lg:flex-row">
@@ -98,7 +99,7 @@ function OrderTracking() {
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
                       <span className="font-medium text-gray-900 dark:text-white">
-                        Mã sản phẩm:
+                        Product Code:
                       </span>{" "}
                       {item.productId}
                     </p>
@@ -122,13 +123,13 @@ function OrderTracking() {
             <div className="grow">
               <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Thông tin đơn hàng
+                  Order Details
                 </h3>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Ngày đặt hàng
+                      Order Date
                     </p>
                     <p className="text-base font-semibold text-gray-900 dark:text-white">
                       {new Date(orderDetails.orderDate).toLocaleDateString(
@@ -139,7 +140,7 @@ function OrderTracking() {
 
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Trạng thái
+                      Status
                     </p>
                     <p className="text-base font-semibold text-gray-900 dark:text-white">
                       {orderDetails.status}
@@ -148,7 +149,7 @@ function OrderTracking() {
 
                   <div className="flex items-center justify-between border-t pt-4">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Tổng tiền
+                      Total
                     </p>
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {new Intl.NumberFormat("vi-VN", {
@@ -167,7 +168,7 @@ function OrderTracking() {
                         type="button"
                         className="w-full rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
                       >
-                        Hủy đơn hàng
+                        Cancel Order
                       </button>
                     )}
                 </div>

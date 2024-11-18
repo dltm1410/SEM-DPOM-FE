@@ -150,20 +150,12 @@ const Cart = () => {
 
     try {
       setIsLoading(true);
-      const orderData = {
-        items: cartData.items.map((item) => ({
-          productVariantId: item.productVariantId,
-          quantity: item.quantity,
-          price: item.productPrice,
-        })),
-        totalAmount: total,
-        address: address,
-        paymentMethod: paymentMethod,
-      };
 
-      const response = await axiosInstance.post("/orders", orderData);
+      const response = await axiosInstance.post("/orders", {
+        shippingAddress: address,
+      });
       toast.success("Đặt hàng thành công!");
-      navigate(`/confirm-order/${response.data.orderId}`);
+      navigate(`/confirm-order/${response.data.order._id}`);
     } catch (error) {
       console.error("Error placing order:", error);
       toast.error(

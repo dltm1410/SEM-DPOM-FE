@@ -12,9 +12,8 @@ function OrderTracking() {
     const fetchOrderDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get("/orders/id", {
-          orderId: orderId,
-        });
+        console.log(orderId)
+        const response = await axiosInstance.get(`/orders/id/${orderId}`);
 
         console.log("API Response:", response.data);
 

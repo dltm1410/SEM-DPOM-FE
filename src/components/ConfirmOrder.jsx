@@ -13,7 +13,7 @@ const ConfirmOrder = () => {
       try {
         setIsLoading(true);
         console.log("orderId", orderId);
-        const response = await axiosInstance.get(`/orders/${orderId}`);
+        const response = await axiosInstance.get(`/orders/id/${orderId}`);
         setOrderDetails(response.data);
         console.log("orderDetails", response.data);
       } catch (error) {
@@ -46,7 +46,7 @@ const ConfirmOrder = () => {
         <p className="text-gray-500 dark:text-gray-400 mb-6 md:mb-8">
           Đơn hàng{" "}
           <span className="font-medium text-gray-900 dark:text-white">
-            #{orderDetails?.orderId}
+            #{orderDetails?.order.orderId}
           </span>{" "}
           sẽ được xử lý trong vòng 24 giờ làm việc. Chúng tôi sẽ thông báo qua
           email khi đơn hàng được gửi đi.
@@ -57,7 +57,7 @@ const ConfirmOrder = () => {
               Ngày đặt hàng
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white sm:text-end">
-              {new Date(orderDetails?.createdAt).toLocaleDateString("vi-VN")}
+              {new Date(orderDetails?.order.orderDate).toLocaleDateString("vi-VN")}
             </dd>
           </dl>
           <dl className="sm:flex items-center justify-between gap-4">
@@ -65,9 +65,9 @@ const ConfirmOrder = () => {
               Phương thức thanh toán
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white sm:text-end">
-              {orderDetails?.paymentMethod === "cash"
-                ? "Thanh toán khi nhận hàng"
-                : "MoMo"}
+
+              Thanh toán khi nhận hàng
+
             </dd>
           </dl>
           <dl className="sm:flex items-center justify-between gap-4">
@@ -75,7 +75,7 @@ const ConfirmOrder = () => {
               Địa chỉ giao hàng
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white sm:text-end">
-              {orderDetails?.address}
+              {orderDetails?.order.shippingAddress}
             </dd>
           </dl>
           <dl className="sm:flex items-center justify-between gap-4">
@@ -86,7 +86,7 @@ const ConfirmOrder = () => {
               {new Intl.NumberFormat("vi-VN", {
                 style: "currency",
                 currency: "VND",
-              }).format(orderDetails?.totalAmount)}
+              }).format(orderDetails?.order.total)}
             </dd>
           </dl>
         </div>

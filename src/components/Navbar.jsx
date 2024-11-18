@@ -173,16 +173,19 @@ function Navbar() {
                 ) : (
                   <>
                     {cartItems.map((item) => (
-                      <div key={item.product._id} className="grid grid-cols-2">
+                      <div key={item.productId} className="grid grid-cols-2">
                         <div>
                           <Link
                             to={`/product/${item.productId}`}
                             className="truncate text-sm font-semibold leading-none text-gray-900 hover:underline dark:text-white"
                           >
-                            {item.product.title}
+                            {item.productName}
                           </Link>
                           <p className="mt-0.5 truncate text-sm font-normal text-gray-500 dark:text-gray-400">
-                            {formatVND(item.product.price)}
+                            {formatVND(item.productPrice)}
+                          </p>
+                          <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                            {item.size} / {item.color}
                           </p>
                         </div>
 
@@ -192,7 +195,7 @@ function Navbar() {
                           </p>
 
                           <button
-                            onClick={() => removeFromCart(item.product._id)}
+                            onClick={() => removeFromCart(item.productId)}
                             className="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-600"
                           >
                             <span className="sr-only">Remove</span>

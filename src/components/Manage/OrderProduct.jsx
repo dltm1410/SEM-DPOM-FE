@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import orderProducts from "../data/orderproduct.json";
+import orderProducts from "../../data/orderproduct.json";
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",

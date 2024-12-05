@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { axiosInstance } from "../api/axios";
+import { axiosInstance } from "../../api/axios";
 
 const ManageStaff = () => {
   const [staffUsers, setStaffUsers] = useState([]);
@@ -98,11 +98,15 @@ const ManageStaff = () => {
                   <td className="px-4 py-3">{staff.phoneNumber}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`bg-${staff.gender === "male" ? "green" : "red"
-                        }-100 text-${staff.gender === "male" ? "green" : "red"
-                        }-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-${staff.gender === "male" ? "green" : "red"
-                        }-900 dark:text-${staff.gender === "male" ? "green" : "red"
-                        }-300`}
+                      className={`bg-${
+                        staff.gender === "male" ? "green" : "red"
+                      }-100 text-${
+                        staff.gender === "male" ? "green" : "red"
+                      }-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-${
+                        staff.gender === "male" ? "green" : "red"
+                      }-900 dark:text-${
+                        staff.gender === "male" ? "green" : "red"
+                      }-300`}
                     >
                       {staff.gender}
                     </span>

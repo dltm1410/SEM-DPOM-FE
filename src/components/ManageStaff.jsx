@@ -5,6 +5,20 @@ const ManageStaff = () => {
   const [staffUsers, setStaffUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
+  const [newStaff, setNewStaff] = useState({
+    username: "",
+    role: "staff",
+    password: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "male",
+    address: "",
+    phoneNumber: ""
+  });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   useEffect(() => {
     const fetchStaffUsers = async () => {
@@ -25,6 +39,59 @@ const ManageStaff = () => {
     fetchStaffUsers();
   }, []);
 
+  const handleEdit = (staff) => {
+    setIsEditMode(true);
+    setSelectedStaff(staff);
+    setNewStaff({
+      username: staff.username,
+      role: staff.role,
+      password: "",
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      email: staff.email,
+      gender: staff.gender,
+      address: staff.address,
+      phoneNumber: staff.phoneNumber
+    });
+    setIsAddStaffModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (isEditMode) {
+        const response = await axiosInstance.put(`/users/${selectedStaff.userID}`, newStaff);
+        setStaffUsers(prevUsers => 
+          prevUsers.map(user => 
+            user.userID === selectedStaff.userID ? response.data.user : user
+          )
+        );
+      } else {
+        const response = await axiosInstance.post("/users/create", newStaff);
+        setStaffUsers(prevUsers => [...prevUsers, response.data.user]);
+      }
+      
+      setIsAddStaffModalOpen(false);
+      setIsEditMode(false);
+      setSelectedStaff(null);
+      setNewStaff({
+        username: "",
+        role: "staff",
+        password: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        gender: "male",
+        address: "",
+        phoneNumber: ""
+      });
+    } catch (err) {
+      console.error("Error saving staff:", err);
+    }
+  };
+
+  const modalTitle = isEditMode ? "Edit Staff" : "Add New Staff";
+
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>{error}</div>;
   return (
@@ -40,6 +107,7 @@ const ManageStaff = () => {
           <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
             <button
               type="button"
+              onClick={() => setIsAddStaffModalOpen(true)}
               className="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
             >
               <svg
@@ -150,6 +218,169 @@ const ManageStaff = () => {
           </table>
         </div>
       </div>
+
+      {/* Add Staff Modal */}
+      {isAddStaffModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b dark:border-gray-700">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white text-center">
+                {modalTitle}
+              </h3>
+            </div>
+
+            {/* Modal Body with Scroll */}
+            <div className="px-6 py-4 overflow-y-auto max-h-[calc(90vh-130px)]">
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      value={newStaff.username}
+                      onChange={(e) => setNewStaff({...newStaff, username: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Role
+                    </label>
+                    <select
+                      value={newStaff.role}
+                      onChange={(e) => setNewStaff({...newStaff, role: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    >
+                      <option value="staff">Staff</option>
+                      <option value="manager">Manager</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={newStaff.password}
+                      onChange={(e) => setNewStaff({...newStaff, password: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newStaff.firstName}
+                        onChange={(e) => setNewStaff({...newStaff, firstName: e.target.value})}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={newStaff.lastName}
+                        onChange={(e) => setNewStaff({...newStaff, lastName: e.target.value})}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={newStaff.email}
+                      onChange={(e) => setNewStaff({...newStaff, email: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Gender
+                    </label>
+                    <select
+                      value={newStaff.gender}
+                      onChange={(e) => setNewStaff({...newStaff, gender: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    >
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={newStaff.address}
+                      onChange={(e) => setNewStaff({...newStaff, address: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={newStaff.phoneNumber}
+                      onChange={(e) => setNewStaff({...newStaff, phoneNumber: e.target.value})}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                      required
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+              <div className="flex justify-center space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddStaffModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-700 dark:hover:bg-red-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

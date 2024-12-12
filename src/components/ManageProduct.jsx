@@ -14,6 +14,13 @@ const ManageProduct = () => {
     stock: "",
     price: "",
   });
+  const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [updateForm, setUpdateForm] = useState({
+    stock: "",
+    address: "",
+    phone: ""
+  });
 
   const handleAddProduct = (e) => {
     e.preventDefault();
@@ -129,29 +136,15 @@ const ManageProduct = () => {
                     Stock
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Sales/Day
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Sales/Month
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Rating
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Sales
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Revenue
-                  </th>
-                  <th scope="col" className="px-4 py-3">
-                    Last Update
+                    Update
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {/* Product Row 1 */}
+                {/* Product Row */}
                 <tr className="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <td className="w-4 px-4 py-3">
+                  {/* Checkbox cell */}
+                  <td className="w-4 px-4 py-4">
                     <div className="flex items-center">
                       <input
                         id="checkbox-table-search-1"
@@ -159,73 +152,52 @@ const ManageProduct = () => {
                         onClick={(e) => e.stopPropagation()}
                         className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
-                      <label
-                        htmlFor="checkbox-table-search-1"
-                        className="sr-only"
-                      >
-                        checkbox
-                      </label>
+                      <label htmlFor="checkbox-table-search-1" className="sr-only">checkbox</label>
                     </div>
                   </td>
-                  <th
-                    scope="row"
-                    className="flex items-center px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                  >
+                  {/* Product name cell */}
+                  <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     Áo Hoddie
-                  </th>
-                  <td className="px-4 py-2">
+                  </td>
+                  {/* Category cell */}
+                  <td className="px-4 py-4">
                     <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">
                       Clothing
                     </span>
                   </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  {/* Stock cell */}
+                  <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     <div className="flex items-center">
                       <div className="inline-block w-4 h-4 mr-2 bg-red-700 rounded-full"></div>
                       95
                     </div>
                   </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    1.47
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    0.47
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, index) => (
-                        <svg
-                          key={index}
-                          aria-hidden="true"
-                          className="w-5 h-5 text-yellow-400"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                      <span className="ml-1 text-gray-500 dark:text-gray-400">
-                        5.0
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    <div className="flex items-center">
+                  {/* Update button cell */}
+                  <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <button
+                      onClick={() => {
+                        setSelectedProduct({
+                          name: "Áo Hoddie",
+                          category: "Clothing",
+                          currentStock: 95
+                        });
+                        setIsUpdateStockModalOpen(true);
+                      }}
+                      className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:text-blue-100 dark:hover:bg-blue-600"
+                    >
                       <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
+                        className="w-4 h-4"
                         fill="currentColor"
-                        className="w-5 h-5 mr-2 text-gray-400"
-                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                          clipRule="evenodd"
+                        />
                       </svg>
-                      1.6M
-                    </div>
-                  </td>
-                  <td className="px-4 py-2">$3.2M</td>
-                  <td className="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    Just now
+                    </button>
                   </td>
                 </tr>
 
@@ -283,6 +255,110 @@ const ManageProduct = () => {
                     <option value="Desktop PC">Desktop PC</option>
                     <option value="Laptop">Laptop</option>
                   </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Update Product Modal */}
+      {isUpdateStockModalOpen && selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+              Update Product Information
+            </h3>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              console.log("Updating product with:", updateForm);
+              setIsUpdateStockModalOpen(false);
+              setUpdateForm({ stock: "", address: "", phone: "" });
+            }}>
+              <div className="space-y-4">
+                {/* Product Name - Read Only */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Product Name
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedProduct.name}
+                    disabled
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
+                  />
+                </div>
+
+                {/* Category - Read Only */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedProduct.category}
+                    disabled
+                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
+                  />
+                </div>
+
+                {/* Stock - Editable */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Stock
+                  </label>
+                  <input
+                    type="number"
+                    value={updateForm.stock}
+                    onChange={(e) => setUpdateForm({...updateForm, stock: e.target.value})}
+                    placeholder={`Current: ${selectedProduct.currentStock}`}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                  />
+                </div>
+
+                {/* Address - New Field */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Address
+                  </label>
+                  <input
+                    type="text"
+                    value={updateForm.address}
+                    onChange={(e) => setUpdateForm({...updateForm, address: e.target.value})}
+                    placeholder="Enter address"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                  />
+                </div>
+
+                {/* Phone - New Field */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={updateForm.phone}
+                    onChange={(e) => setUpdateForm({...updateForm, phone: e.target.value})}
+                    placeholder="Enter phone"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                  />
+                </div>
+
+                {/* Thêm các nút ở cuối form */}
+                <div className="flex justify-center space-x-3 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsUpdateStockModalOpen(false)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-200 dark:bg-red-700 dark:text-white dark:border-red-600 dark:hover:bg-red-800 dark:focus:ring-red-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </form>

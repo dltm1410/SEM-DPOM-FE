@@ -1,0 +1,112 @@
+[
+  {
+    "productID": 1,
+    "name": "Áo thun nam",
+    "categoryID": 201,
+    "total": 50,
+    "description": "Áo thun nam cotton thoáng mát",
+    "price": 150000,
+    "rating": 4.7,
+    "material": "Cotton",
+    "season": "Summer"
+  },
+  {
+    "productID": 2,
+    "name": "Quần jean nữ",
+    "categoryID": 202,
+    "total": 40,
+    "description": "Quần jean nữ dáng ôm co giãn",
+    "price": 850000,
+    "rating": 4.5,
+    "material": "Denim",
+    "season": "All Season"
+  },
+  {
+    "productID": 3,
+    "name": "Áo sơ mi trắng",
+    "categoryID": 201,
+    "total": 30,
+    "description": "Áo sơ mi trắng phù hợp cho công sở",
+    "price": 450000,
+    "rating": 4.6,
+    "material": "Polyester",
+    "season": "All Season"
+  },
+  {
+    "productID": 4,
+    "name": "Váy dài mùa hè",
+    "categoryID": 203,
+    "total": 25,
+    "description": "Váy dài thoáng mát cho mùa hè",
+    "price": 650000,
+    "rating": 4.8,
+    "material": "Vải lanh",
+    "season": "Summer"
+  },
+  {
+    "productID": 5,
+    "name": "Áo khoác da",
+    "categoryID": 204,
+    "total": 15,
+    "description": "Áo khoác da phong cách",
+    "price": 2500000,
+    "rating": 4.9,
+    "material": "Da",
+    "season": "Winter"
+  },
+  {
+    "productID": 6,
+    "name": "Quần short thể thao",
+    "categoryID": 205,
+    "total": 60,
+    "description": "Quần short thể thao co giãn",
+    "price": 250000,
+    "rating": 4.4,
+    "material": "Polyester",
+    "season": "Summer"
+  },
+  {
+    "productID": 7,
+    "name": "Đầm dự tiệc",
+    "categoryID": 203,
+    "total": 20,
+    "description": "Đầm dự tiệc sang trọng",
+    "price": 1000000,
+    "rating": 4.7,
+    "material": "Lụa",
+    "season": "All Season"
+  },
+  {
+    "productID": 8,
+    "name": "Áo hoodie",
+    "categoryID": 201,
+    "total": 45,
+    "description": "Áo hoodie thoải mái cho mùa lạnh",
+    "price": 300000,
+    "rating": 4.5,
+    "material": "Vải nỉ",
+    "season": "Winter"
+  },
+  {
+    "productID": 9,
+    "name": "Quần tây nam",
+    "categoryID": 202,
+    "total": 35,
+    "description": "Quần tây nam lịch sự phù hợp cho công sở",
+    "price": 450000,
+    "rating": 4.6,
+    "material": "Vải kaki",
+    "season": "All Season"
+  },
+  {
+    "productID": 10,
+    "name": "Áo ba lỗ nữ",
+    "categoryID": 205,
+    "total": 55,
+    "description": "Áo ba lỗ nữ thoải mái",
+    "price": 100000,
+    "rating": 4.3,
+    "material": "Cotton",
+    "season": "Summer"
+  }
+]

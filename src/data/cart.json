@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Áo thun nam",
+    "price": 150000,
+    "quantity": 2,
+    "size": "L",
+    "color": "Trắng"
+  },
+  {
+    "name": "Quần jean nữ",
+    "price": 850000,
+    "quantity": 1,
+    "size": "M",
+    "color": "Xanh đậm"
+  },
+  {
+    "name": "Áo sơ mi trắng",
+    "price": 450000,
+    "quantity": 1,
+    "size": "XL",
+    "color": "Trắng"
+  },
+  {
+    "name": "Váy dài mùa hè",
+    "price": 650000,
+    "quantity": 1,
+    "size": "S",
+    "color": "Hồng"
+  },
+  {
+    "name": "Áo hoodie",
+    "price": 550000,
+    "quantity": 2,
+    "size": "L",
+    "color": "Đen"
+  }
+]

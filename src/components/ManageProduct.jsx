@@ -144,11 +144,7 @@ const ManageProduct = () => {
             <div className="flex items-center flex-1 space-x-4">
               <h5>
                 <span className="text-gray-500">All Products:</span>
-                <span className="dark:text-white">123456</span>
-              </h5>
-              <h5>
-                <span className="text-gray-500">Total sales:</span>
-                <span className="dark:text-white">$88.4k</span>
+                <span className="dark:text-white">{products.length}</span>
               </h5>
             </div>
             <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
@@ -171,28 +167,6 @@ const ManageProduct = () => {
                   />
                 </svg>
                 Add new product
-              </button>
-
-              <button
-                type="button"
-                className="flex items-center justify-center flex-shrink-0 px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-                  />
-                </svg>
-                Export
               </button>
             </div>
           </div>
@@ -278,7 +252,7 @@ const ManageProduct = () => {
                               : "bg-red-700"
                           } rounded-full`}
                         ></div>
-                        {product.stock}
+                        {product.totalStock}
                       </div>
                     </td>
                     <td className="px-4 py-4">
@@ -413,7 +387,7 @@ const ManageProduct = () => {
                 </div>
 
                 {/* Thêm phần footer với buttons vào đây */}
-                <div className="border-t bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+                <div className="border-t  px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
                   <div className="flex justify-center space-x-3">
                     <button
                       type="button"
@@ -501,39 +475,7 @@ const ManageProduct = () => {
                       setUpdateForm({ ...updateForm, stock: e.target.value })
                     }
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="Nhập số lượng"
-                  />
-                </div>
-
-                {/* Address - New Field */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    value={updateForm.address}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, address: e.target.value })
-                    }
-                    placeholder="Enter address"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  />
-                </div>
-
-                {/* Phone - New Field */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    value={updateForm.phone}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, phone: e.target.value })
-                    }
-                    placeholder="Enter phone"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Enter quantity"
                   />
                 </div>
 
@@ -544,7 +486,7 @@ const ManageProduct = () => {
                     onClick={handleCloseUpdateModal}
                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
                   >
-                    Hủy
+                    Cancel
                   </button>
                   <button
                     type="submit"

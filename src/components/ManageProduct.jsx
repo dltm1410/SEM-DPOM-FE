@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../api/axios";
+import ManageVariant from "./ManageVariant";
+import { toast } from "react-hot-toast";
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -9,16 +11,10 @@ const formatVND = (amount) => {
 
 const ManageProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [updateForm, setUpdateForm] = useState({
-    stock: "",
-    address: "",
-    phone: "",
-  });
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -37,6 +33,26 @@ const ManageProduct = () => {
   });
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [showVariantModal, setShowVariantModal] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get("/products");
+      setProducts(response.data.products || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to refresh product list");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -50,24 +66,6 @@ const ManageProduct = () => {
     };
 
     fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get("/products");
-        setProducts(response.data.products || []);
-        console.log(response.data.products);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -96,15 +94,6 @@ const ManageProduct = () => {
     } catch (error) {
       console.error("Lỗi khi thêm sản phẩm:", error);
     }
-  };
-
-  const handleCloseUpdateModal = () => {
-    setIsUpdateStockModalOpen(false);
-    setUpdateForm({
-      stock: "",
-      address: "",
-      phone: "",
-    });
   };
 
   const handleEditClick = (product) => {
@@ -259,10 +248,11 @@ const ManageProduct = () => {
                       <div className="flex items-center justify-center space-x-4">
                         <button
                           onClick={() => {
-                            setSelectedProduct(product);
-                            setIsUpdateStockModalOpen(true);
+                            setSelectedProductId(product._id);
+                            setShowVariantModal(true);
                           }}
                           className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:text-blue-100 dark:hover:bg-blue-600"
+                          title="Manage Variants"
                         >
                           <svg
                             className="w-4 h-4"
@@ -272,7 +262,7 @@ const ManageProduct = () => {
                           >
                             <path
                               fillRule="evenodd"
-                              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                               clipRule="evenodd"
                             />
                           </svg>
@@ -415,88 +405,6 @@ const ManageProduct = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Update Product Modal */}
-      {isUpdateStockModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
-              Restock Product Information
-            </h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                console.log("Updating product with:", updateForm);
-                handleCloseUpdateModal();
-              }}
-            >
-              <div className="space-y-4">
-                {/* Product Name - Read Only */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedProduct.title}
-                    disabled
-                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
-                  />
-                </div>
-
-                {/* Category - Read Only */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Category
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      categoryMap[selectedProduct.categoryId] ||
-                      "Không có danh mục"
-                    }
-                    disabled
-                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
-                  />
-                </div>
-
-                {/* Stock - Editable */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Stock
-                  </label>
-                  <input
-                    type="number"
-                    value={updateForm.stock}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, stock: e.target.value })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="Enter quantity"
-                  />
-                </div>
-
-                {/* Thêm các nút ở cuối form */}
-                <div className="flex justify-center space-x-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={handleCloseUpdateModal}
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
           </div>
         </div>
       )}
@@ -658,6 +566,24 @@ const ManageProduct = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showVariantModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md">
+            <ManageVariant
+              productId={selectedProductId}
+              onClose={() => {
+                setShowVariantModal(false);
+                setSelectedProductId(null);
+              }}
+              onUpdate={async () => {
+                await fetchProducts();
+                toast.success("Product list refreshed");
+              }}
+            />
           </div>
         </div>
       )}

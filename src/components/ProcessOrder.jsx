@@ -141,8 +141,10 @@ const ProcessOrder = () => {
                           ${
                             order.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                              : order.status === "accepted"
+                              : order.status === "Accepted"
                               ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                              : order.status === "In-transit" // Thêm điều kiện cho "In-transit"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                               : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                           }`}
                       >
@@ -154,15 +156,14 @@ const ProcessOrder = () => {
                     <button
                       onClick={() => handleAccept(order.orderId)}
                       disabled={
-                        order.status === "Accepted" ||
+                        order.status === "In-transit" ||
                         order.status === "Rejected"
                       }
                       className={`px-3 py-1 rounded-lg border text-xs font-medium
                         ${
-                          order.status === "Accepted" ||
-                          order.status === "Rejected"
-                            ? "border-gray-300 text-gray-300 cursor-not-allowed"
-                            : "border-green-700 text-green-700 hover:bg-green-700 hover:text-white"
+                          order.status === null || order.status === "Pending"
+                            ? "border-green-700 text-green-700 hover:bg-green-700 hover:text-white"
+                            : "border-gray-300 text-gray-300 cursor-not-allowed"
                         }`}
                     >
                       Accept
@@ -170,15 +171,14 @@ const ProcessOrder = () => {
                     <button
                       onClick={() => handleReject(order.orderId)}
                       disabled={
-                        order.status === "Accepted" ||
+                        order.status === "In-transit" ||
                         order.status === "Rejected"
                       }
                       className={`px-3 py-1 rounded-lg border text-xs font-medium
                         ${
-                          order.status === "Accepted" ||
-                          order.status === "Rejected"
-                            ? "border-gray-300 text-gray-300 cursor-not-allowed"
-                            : "border-red-700 text-red-700 hover:bg-red-700 hover:text-white"
+                          order.status === null || order.status === "Pending"
+                            ? "border-red-700 text-red-700 hover:bg-red-700 hover:text-white"
+                            : "border-gray-300 text-gray-300 cursor-not-allowed"
                         }`}
                     >
                       Reject

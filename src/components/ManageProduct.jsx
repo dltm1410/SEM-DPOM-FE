@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../api/axios";
+import ManageVariant from "./ManageVariant";
+import { toast } from "react-hot-toast";
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -9,16 +11,10 @@ const formatVND = (amount) => {
 
 const ManageProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpdateStockModalOpen, setIsUpdateStockModalOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [updateForm, setUpdateForm] = useState({
-    stock: "",
-    address: "",
-    phone: "",
-  });
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
@@ -37,6 +33,26 @@ const ManageProduct = () => {
   });
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [showVariantModal, setShowVariantModal] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get("/products");
+      setProducts(response.data.products || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("Failed to refresh product list");
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -50,24 +66,6 @@ const ManageProduct = () => {
     };
 
     fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get("/products");
-        setProducts(response.data.products || []);
-        console.log(response.data.products);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -96,15 +94,6 @@ const ManageProduct = () => {
     } catch (error) {
       console.error("Lỗi khi thêm sản phẩm:", error);
     }
-  };
-
-  const handleCloseUpdateModal = () => {
-    setIsUpdateStockModalOpen(false);
-    setUpdateForm({
-      stock: "",
-      address: "",
-      phone: "",
-    });
   };
 
   const handleEditClick = (product) => {
@@ -144,11 +133,7 @@ const ManageProduct = () => {
             <div className="flex items-center flex-1 space-x-4">
               <h5>
                 <span className="text-gray-500">All Products:</span>
-                <span className="dark:text-white">123456</span>
-              </h5>
-              <h5>
-                <span className="text-gray-500">Total sales:</span>
-                <span className="dark:text-white">$88.4k</span>
+                <span className="dark:text-white">{products.length}</span>
               </h5>
             </div>
             <div className="flex flex-col flex-shrink-0 space-y-3 md:flex-row md:items-center lg:justify-end md:space-y-0 md:space-x-3">
@@ -171,28 +156,6 @@ const ManageProduct = () => {
                   />
                 </svg>
                 Add new product
-              </button>
-
-              <button
-                type="button"
-                className="flex items-center justify-center flex-shrink-0 px-3 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-              >
-                <svg
-                  className="w-4 h-4 mr-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-                  />
-                </svg>
-                Export
               </button>
             </div>
           </div>
@@ -271,35 +234,37 @@ const ManageProduct = () => {
                       <div className="flex items-center">
                         <div
                           className={`inline-block w-4 h-4 mr-2 ${
-                            product.stock > 50
-                              ? "bg-green-700"
-                              : product.stock > 20
-                              ? "bg-yellow-700"
+                            product.totalStock > 1000
+                              ? "bg-green-500"
+                              : product.totalStock > 900
+                              ? "bg-yellow-300"
                               : "bg-red-700"
                           } rounded-full`}
                         ></div>
-                        {product.stock}
+                        {product.totalStock}
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center justify-center space-x-4">
                         <button
                           onClick={() => {
-                            setSelectedProduct(product);
-                            setIsUpdateStockModalOpen(true);
+                            setSelectedProductId(product._id);
+                            setShowVariantModal(true);
                           }}
                           className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:text-blue-100 dark:hover:bg-blue-600"
+                          title="Manage Variants"
                         >
                           <svg
-                            className="w-4 h-4"
+                            className="h-4 w-4" // Thay đổi kích thước icon nếu cần
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
                           >
                             <path
-                              fillRule="evenodd"
-                              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
                               clipRule="evenodd"
+                              fillRule="evenodd"
+                              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
                             />
                           </svg>
                         </button>
@@ -413,7 +378,7 @@ const ManageProduct = () => {
                 </div>
 
                 {/* Thêm phần footer với buttons vào đây */}
-                <div className="border-t bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+                <div className="border-t  px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
                   <div className="flex justify-center space-x-3">
                     <button
                       type="button"
@@ -441,120 +406,6 @@ const ManageProduct = () => {
                 </div>
               </form>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Update Product Modal */}
-      {isUpdateStockModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
-              Restock Product Information
-            </h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                console.log("Updating product with:", updateForm);
-                handleCloseUpdateModal();
-              }}
-            >
-              <div className="space-y-4">
-                {/* Product Name - Read Only */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Product Name
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedProduct.title}
-                    disabled
-                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
-                  />
-                </div>
-
-                {/* Category - Read Only */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Category
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      categoryMap[selectedProduct.categoryId] ||
-                      "Không có danh mục"
-                    }
-                    disabled
-                    className="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
-                  />
-                </div>
-
-                {/* Stock - Editable */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Stock
-                  </label>
-                  <input
-                    type="number"
-                    value={updateForm.stock}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, stock: e.target.value })
-                    }
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="Nhập số lượng"
-                  />
-                </div>
-
-                {/* Address - New Field */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    value={updateForm.address}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, address: e.target.value })
-                    }
-                    placeholder="Enter address"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  />
-                </div>
-
-                {/* Phone - New Field */}
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                    Phone
-                  </label>
-                  <input
-                    type="text"
-                    value={updateForm.phone}
-                    onChange={(e) =>
-                      setUpdateForm({ ...updateForm, phone: e.target.value })
-                    }
-                    placeholder="Enter phone"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  />
-                </div>
-
-                {/* Thêm các nút ở cuối form */}
-                <div className="flex justify-center space-x-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={handleCloseUpdateModal}
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
           </div>
         </div>
       )}
@@ -716,6 +567,24 @@ const ManageProduct = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showVariantModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md">
+            <ManageVariant
+              productId={selectedProductId}
+              onClose={() => {
+                setShowVariantModal(false);
+                setSelectedProductId(null);
+              }}
+              onUpdate={async () => {
+                await fetchProducts();
+                toast.success("Product list refreshed");
+              }}
+            />
           </div>
         </div>
       )}

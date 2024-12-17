@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const axiosInstance = axios.create({
-  baseURL: "http://localhost:5001/api/v1", // Thay đổi baseURL theo API của bạn
+export const axiosInstance = axios.create({
+  baseURL: "http://localhost:5001/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
@@ -10,29 +10,45 @@ const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log('Request config:', {
+      url: config.url,
+      method: config.method,
+      headers: config.headers,
+    });
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
 // Add a response interceptor
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response) => {
+    console.log('Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
+  async (error) => {
+    console.error('Response error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      message: error.response?.data?.message,
+    });
+    
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
+      delete axiosInstance.defaults.headers.common['Authorization'];
       window.location.href = "/signin";
     }
     return Promise.reject(error);
   }
 );
-
-export { axiosInstance }; // Named export
-// hoặc
-export default axiosInstance; // Default export

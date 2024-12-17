@@ -245,10 +245,10 @@ const ManageProduct = () => {
                       <div className="flex items-center">
                         <div
                           className={`inline-block w-4 h-4 mr-2 ${
-                            product.stock > 50
-                              ? "bg-green-700"
-                              : product.stock > 20
-                              ? "bg-yellow-700"
+                            product.totalStock > 1000
+                              ? "bg-green-500"
+                              : product.totalStock > 900
+                              ? "bg-yellow-300"
                               : "bg-red-700"
                           } rounded-full`}
                         ></div>

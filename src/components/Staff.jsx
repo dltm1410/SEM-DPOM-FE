@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import ManageProduct from "./ManageProduct";
 import ProcessOrder from "./ProcessOrder";
 import Report from "./Report";
@@ -9,6 +10,7 @@ import NotFound from "./NotFound";
 const Staff = () => {
   const [currentView, setCurrentView] = useState("manageProduct");
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleNavigation = (view) => {
     setCurrentView(view);
@@ -16,9 +18,7 @@ const Staff = () => {
   };
 
   const handleLogout = () => {
-    // Xử lý đăng xuất, ví dụ: xóa token, chuyển hướng đến trang đăng nhập
-    localStorage.removeItem("token"); // Xóa token nếu bạn lưu trong localStorage
-    window.location.href = "/signin"; // Chuyển hướng đến trang đăng nhập
+    logout();
   };
 
   return (

@@ -1,11 +1,19 @@
 import { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import ManageProduct from "./ManageProduct";
 import ProcessOrder from "./ProcessOrder";
 import Report from "./Report";
 import ManageStaff from "./ManageStaff";
+import NotFound from "./NotFound";
 
 const Staff = () => {
   const [currentView, setCurrentView] = useState("manageProduct");
+  const navigate = useNavigate();
+
+  const handleNavigation = (view) => {
+    setCurrentView(view);
+    navigate(`/staff/${view}`);
+  };
 
   return (
     <div className="antialiased bg-gray-50 dark:bg-gray-900">
@@ -119,7 +127,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("manageProduct")}
+                onClick={() => handleNavigation("manageProduct")}
               >
                 <svg
                   aria-hidden="true"
@@ -143,7 +151,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("processOrder")}
+                onClick={() => handleNavigation("processOrder")}
               >
                 <svg
                   aria-hidden="true"
@@ -168,7 +176,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("manageStaff")}
+                onClick={() => handleNavigation("manageStaff")}
               >
                 <svg
                   aria-hidden="true"
@@ -191,10 +199,10 @@ const Staff = () => {
           </ul>
           <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <li>
-              <a
-                href="#"
+              <button
+                type="button"
                 className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-                onClick={() => setCurrentView("report")}
+                onClick={() => handleNavigation("report")}
               >
                 <svg
                   aria-hidden="true"
@@ -211,7 +219,7 @@ const Staff = () => {
                   />
                 </svg>
                 <span className="ml-3">Report</span>
-              </a>
+              </button>
             </li>
           </ul>
         </div>
@@ -219,10 +227,14 @@ const Staff = () => {
 
       {/* Main content */}
       <main className="p-4 md:ml-64 h-auto pt-20">
-        {currentView === "manageProduct" && <ManageProduct />}
-        {currentView === "processOrder" && <ProcessOrder />}
-        {currentView === "report" && <Report />}
-        {currentView === "manageStaff" && <ManageStaff />}
+        <Routes>
+          <Route path="/" element={<ManageProduct />} />
+          <Route path="/manageProduct" element={<ManageProduct />} />
+          <Route path="/processOrder" element={<ProcessOrder />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/manageStaff" element={<ManageStaff />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
     </div>
   );

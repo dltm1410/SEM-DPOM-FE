@@ -7,6 +7,12 @@ import ManageStaff from "./ManageStaff";
 const Staff = () => {
   const [currentView, setCurrentView] = useState("manageProduct");
 
+  const handleLogout = () => {
+    // Xử lý đăng xuất, ví dụ: xóa token, chuyển hướng đến trang đăng nhập
+    localStorage.removeItem("token"); // Xóa token nếu bạn lưu trong localStorage
+    window.location.href = "/signin"; // Chuyển hướng đến trang đăng nhập
+  };
+
   return (
     <div className="antialiased bg-gray-50 dark:bg-gray-900">
       <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
@@ -211,6 +217,29 @@ const Staff = () => {
               </a>
             </li>
           </ul>
+          <div className="fixed bottom-4 left-4 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FF0000"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2"
+              onClick={handleLogout}
+            >
+              <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M19.8 12H9" />
+            </svg>
+            <span
+              className="text-sm font-medium text-red-600 cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </span>
+          </div>
         </div>
       </aside>
 
@@ -221,6 +250,8 @@ const Staff = () => {
         {currentView === "report" && <Report />}
         {currentView === "manageStaff" && <ManageStaff />}
       </main>
+
+      {/* Nút Logout */}
     </div>
   );
 };

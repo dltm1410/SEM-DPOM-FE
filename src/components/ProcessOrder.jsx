@@ -32,7 +32,7 @@ const ProcessOrder = () => {
   const handleAccept = async (orderId) => {
     try {
       await axiosInstance.put(`/orders/status`, {
-        orderId: orderId,
+        orderID: orderId,
         status: "In-transit",
       });
       toast.success("Đã chấp nhận đơn hàng");
@@ -46,7 +46,7 @@ const ProcessOrder = () => {
   const handleReject = async (orderId) => {
     try {
       await axiosInstance.put(`/orders/status`, {
-        orderId: orderId,
+        orderID: orderId,
         status: "Rejected",
       });
       toast.success("Đã từ chối đơn hàng");
@@ -60,10 +60,14 @@ const ProcessOrder = () => {
     if (!status) return "gray";
 
     switch (status.toLowerCase()) {
+      case "in-transit":
+        return "blue";
+      case "delivered":
+        return "green";
       case "pending":
         return "yellow";
       case "accepted":
-        return "green";
+        return "blue";
       case "rejected":
         return "red";
       default:

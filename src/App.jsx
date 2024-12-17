@@ -28,86 +28,25 @@ function App() {
           {/* Staff routes */}
           <Route path="/staff/*" element={<StaffRoute><Staff /></StaffRoute>} />
 
-          {/* Customer routes - all wrapped with Navbar */}
-          <Route
-            path="/*"
-            element={
-              <>
-                <Navbar />
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <CustomerRoute>
-                        <Body />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/cart"
-                    element={
-                      <CustomerRoute>
-                        <Cart />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/orders"
-                    element={
-                      <CustomerRoute>
-                        <Orders />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/confirm-order/:orderId"
-                    element={
-                      <CustomerRoute>
-                        <ConfirmOrder />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/order-summary"
-                    element={
-                      <CustomerRoute>
-                        <OrderSummary />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/product-detail/:id"
-                    element={
-                      <CustomerRoute>
-                        <ProductDetail />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/order-tracking/:orderId"
-                    element={
-                      <CustomerRoute>
-                        <OrderTracking />
-                      </CustomerRoute>
-                    }
-                  />
-                  <Route
-                    path="/account"
-                    element={
-                      <CustomerRoute>
-                        <Account />
-                      </CustomerRoute>
-                    }
-                  />
-                  {/* 404 for customer routes - will show with Navbar and Footer */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <Footer />
-              </>
-            }
-          />
+          {/* Customer routes with shared layout */}
+          <Route element={
+            <>
+              <Navbar />
+              <CustomerRoute />
+              <Footer />
+            </>
+          }>
+            <Route path="/" element={<Body />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/confirm-order/:orderId" element={<ConfirmOrder />} />
+            <Route path="/order-summary" element={<OrderSummary />} />
+            <Route path="/product-detail/:id" element={<ProductDetail />} />
+            <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+            <Route path="/account" element={<Account />} />
+          </Route>
 
-          {/* Global 404 - will show without Navbar and Footer */}
+          {/* Global 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>

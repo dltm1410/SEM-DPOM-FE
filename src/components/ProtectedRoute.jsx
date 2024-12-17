@@ -1,43 +1,22 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import NotFound from './NotFound';
 
-export const ProtectedRoute = ({ children }) => {
+export const CustomerRoute = () => {
   const { user } = useAuth();
   
   if (!user) {
-    return <Navigate to="/signin" />;
+    return <Navigate to="/signin" replace />;
   }
-  
-  return children;
+
+  return <Outlet />;
 };
 
 export const StaffRoute = ({ children }) => {
   const { user } = useAuth();
-  const location = useLocation();
   
-  if (!user) {
-    return <Navigate to="/signin" />;
+  if (!user || user.role !== 'staff') {
+    return <Navigate to="/signin" replace />;
   }
-  
-  if (user.role !== 'staff') {
-    return <NotFound />;
-  }
-  
-  return children;
-};
 
-export const CustomerRoute = ({ children }) => {
-  const { user } = useAuth();
-  const location = useLocation();
-  
-  if (!user) {
-    return <Navigate to="/signin" />;
-  }
-  
-  if (user.role !== 'customer') {
-    return <NotFound />;
-  }
-  
   return children;
 }; 

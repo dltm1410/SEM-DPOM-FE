@@ -15,6 +15,12 @@ const Staff = () => {
     navigate(`/staff/${view}`);
   };
 
+  const handleLogout = () => {
+    // Xử lý đăng xuất, ví dụ: xóa token, chuyển hướng đến trang đăng nhập
+    localStorage.removeItem("token"); // Xóa token nếu bạn lưu trong localStorage
+    window.location.href = "/signin"; // Chuyển hướng đến trang đăng nhập
+  };
+
   return (
     <div className="antialiased bg-gray-50 dark:bg-gray-900">
       <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
@@ -133,17 +139,14 @@ const Staff = () => {
                   aria-hidden="true"
                   className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
                   fill="currentColor"
-                  viewBox="0 0 20 20"
+                  viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                  />
+                  <path d="M12 2L2 7h3v10h14V7h3L12 2z" />
+                  <path d="M9 21V9h6v12H9z" />
                 </svg>
                 <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                  Manage Products & Variants
+                  Inventory
                 </span>
               </button>
             </ul>
@@ -222,6 +225,29 @@ const Staff = () => {
               </button>
             </li>
           </ul>
+          <div className="fixed bottom-4 left-4 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FF0000"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2"
+              onClick={handleLogout}
+            >
+              <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4M16 17l5-5-5-5M19.8 12H9" />
+            </svg>
+            <span
+              className="text-sm font-medium text-red-600 cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </span>
+          </div>
         </div>
       </aside>
 
@@ -236,6 +262,8 @@ const Staff = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+
+      {/* Nút Logout */}
     </div>
   );
 };

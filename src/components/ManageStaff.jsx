@@ -32,39 +32,47 @@ const ManageStaff = () => {
   });
 
   useEffect(() => {
-    const fetchStaffUsers = async () => {
-      try {
-        const response = await axiosInstance.get("/users/staff");
-        console.log(response.data);
-        const staffData = response.data.users;
-        setStaffUsers(staffData);
-        console.log(staffData);
-        setLoading(false);
-      } catch (err) {
-        setError("Có lỗi xảy ra khi tải dữ liệu nhân viên");
-        setLoading(false);
-        console.error("Error fetching staff data:", err);
-      }
-    };
-
     fetchStaffUsers();
   }, []);
 
-  const handleEdit = (staff) => {
-    setIsEditMode(true);
-    setSelectedStaff(staff);
-    setNewStaff({
-      username: staff.username,
-      role: staff.role,
-      password: "",
-      firstName: staff.firstName,
-      lastName: staff.lastName,
-      email: staff.email,
-      gender: staff.gender,
-      address: staff.address,
-      phoneNumber: staff.phoneNumber,
-    });
-    setIsEditStaffModalOpen(true);
+  const fetchStaffUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get("/users/staff");
+      setStaffUsers(response.data.users);
+      setLoading(false);
+    } catch (err) {
+      setError("Có lỗi xảy ra khi tải dữ liệu nhân viên");
+      setLoading(false);
+      console.error("Error fetching staff data:", err);
+    }
+  };
+
+  const handleEdit = async (userId) => {
+    try {
+      // Gọi API để lấy thông tin chi tiết của nhân viên
+      const response = await axiosInstance.get(`/users/${userId}`);
+      console.log("user dang edit", response);
+      const staffData = response.data;
+
+      // Cập nhật state với thông tin nhân viên
+      setSelectedStaff(staffData);
+      setNewStaff({
+        username: staffData.username,
+        role: staffData.role,
+        password: "", // Giữ password trống khi edit
+        firstName: staffData.firstName,
+        lastName: staffData.lastName,
+        email: staffData.email,
+        gender: staffData.gender,
+        address: staffData.address,
+        phoneNumber: staffData.phoneNumber,
+      });
+      setIsEditStaffModalOpen(true);
+      console.log(staffData);
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin nhân viên:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -95,42 +103,33 @@ const ManageStaff = () => {
         firstName: "",
         lastName: "",
         email: "",
-        gender: "male",
+        gender: "Male",
         address: "",
         phoneNumber: "",
       });
+
+      fetchStaffUsers(); // Tải lại dữ liệu sau khi thêm hoặc cập nhật
     } catch (err) {
       console.error("Error saving staff:", err);
     }
   };
 
-  const handleEditStaff = async (userID) => {
-    try {
-      // Lấy thông tin chi tiết của staff dựa vào userID
-      const response = await axiosInstance.get(`/users/${userID}`);
-      const staffData = response.data.user;
+  const handleDelete = async (userId) => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
+      try {
+        await axiosInstance.delete(`/users/${userId}`);
 
-      // Set selected staff và form data
-      setSelectedStaff(staffData);
-      setEditStaffForm({
-        username: staffData.username || "",
-        role: staffData.role || "staff",
-        firstName: staffData.firstName || "",
-        lastName: staffData.lastName || "",
-        email: staffData.email || "",
-        gender: staffData.gender || "male",
-        address: staffData.address || "",
-        phoneNumber: staffData.phoneNumber || "",
-      });
-      setIsEditStaffModalOpen(true);
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin nhân viên:", error);
+        fetchStaffUsers(); // Refresh danh sách nhân viên
+      } catch (error) {
+        console.error("Error deleting staff:", error);
+      }
     }
+    fetchStaffUsers();
   };
 
   const modalTitle = isEditMode ? "Edit Staff" : "Add New Staff";
 
-  if (loading) return <div>Đang tải...</div>;
+  if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   return (
     <div className="px-4 mx-auto max-w-screen-2xl lg:px-12">
@@ -205,51 +204,54 @@ const ManageStaff = () => {
                   <td className="px-4 py-3">
                     <span
                       className={`bg-${
-                        staff.gender === "male" ? "green" : "red"
+                        staff.gender === "Male" ? "green" : "red"
                       }-100 text-${
-                        staff.gender === "male" ? "green" : "red"
+                        staff.gender === "Male" ? "green" : "red"
                       }-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-${
-                        staff.gender === "male" ? "green" : "red"
+                        staff.gender === "Male" ? "green" : "red"
                       }-900 dark:text-${
-                        staff.gender === "male" ? "green" : "red"
+                        staff.gender === "Male" ? "green" : "red"
                       }-300`}
                     >
                       {staff.gender}
                     </span>
                   </td>
-                  <td className="px-4 py-3 flex items-center justify-end">
+                  <td className="px-4 py-3 flex items-center justify-end gap-2">
                     <button
-                      onClick={() => handleEditStaff(staff.userID)}
-                      className="p-2 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                      onClick={() => handleEdit(staff.userID)}
+                      className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-700 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:bg-yellow-700 dark:text-yellow-100 dark:hover:bg-yellow-600"
                     >
                       <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                         <path
-                          fillRule="evenodd"
-                          d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                          clipRule="evenodd"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                         />
                       </svg>
                     </button>
                     <button
-                      onClick={() => handleDelete(staff.uID)}
-                      className="p-2 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                      onClick={() => handleDelete(staff.userID)}
+                      className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold rounded-full bg-red-100 text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-700 dark:text-red-100 dark:hover:bg-red-600"
                     >
                       <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                         />
                       </svg>
                     </button>
@@ -384,8 +386,8 @@ const ManageStaff = () => {
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                     >
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
                     </select>
                   </div>
 
@@ -464,10 +466,12 @@ const ManageStaff = () => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   try {
+                    console.log("submit edit", selectedStaff);
                     const response = await axiosInstance.put(
-                      `/users/${selectedStaff.userID}`,
+                      `/users/update/${selectedStaff._id}`,
                       editStaffForm
                     );
+                    console.log("select", response.data);
                     if (response.status === 200) {
                       setStaffUsers(
                         staffUsers.map((user) =>
@@ -480,7 +484,7 @@ const ManageStaff = () => {
                       setSelectedStaff(null);
                     }
                   } catch (error) {
-                    console.error("Lỗi khi cập nhật nhân viên:", error);
+                    console.error("Error:", error);
                   }
                 }}
                 className="space-y-4"
@@ -580,7 +584,20 @@ const ManageStaff = () => {
                     required
                   />
                 </div>
-
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={newStaff.password}
+                    onChange={(e) =>
+                      setNewStaff({ ...newStaff, password: e.target.value })
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="New password"
+                  />
+                </div>
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Gender
@@ -596,8 +613,8 @@ const ManageStaff = () => {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                     required
                   >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
                   </select>
                 </div>
 

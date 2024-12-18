@@ -62,18 +62,19 @@ const Orders = () => {
     // Filter based on selected order type
     const typeMatch = orderType === "All orders" || order.status === orderType;
 
-    // Parse the order creation date
-    const orderDate = new Date(order.createDate);
+    // Parse the order creation date - convert from "DD/MM/YYYY" format
+    const [day, month, year] = order.createDate.split('/');
+    const orderDate = new Date(year, month - 1, day); // month is 0-based in JS
     const currentDate = new Date();
     let dateMatch = false;
 
     // Apply duration filtering logic
     switch (duration) {
       case "this week":
-        const startOfWeek = new Date(
-          currentDate.setDate(currentDate.getDate() - currentDate.getDay())
-        );
-        dateMatch = orderDate >= startOfWeek && orderDate <= new Date();
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        dateMatch = orderDate >= startOfWeek;
         break;
       case "this month":
         const startOfMonth = new Date(
@@ -81,23 +82,23 @@ const Orders = () => {
           currentDate.getMonth(),
           1
         );
-        dateMatch = orderDate >= startOfMonth && orderDate <= new Date();
+        dateMatch = orderDate >= startOfMonth;
         break;
       case "last 3 months":
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        dateMatch = orderDate >= threeMonthsAgo && orderDate <= new Date();
+        const threeMonthsAgo = new Date(currentDate);
+        threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+        dateMatch = orderDate >= threeMonthsAgo;
         break;
       case "last 6 months":
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-        dateMatch = orderDate >= sixMonthsAgo && orderDate <= new Date();
+        const sixMonthsAgo = new Date(currentDate);
+        sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
+        dateMatch = orderDate >= sixMonthsAgo;
         break;
       case "this year":
         const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
-        dateMatch = orderDate >= startOfYear && orderDate <= new Date();
+        dateMatch = orderDate >= startOfYear;
         break;
-      default:
+      default: // "all time"
         dateMatch = true;
     }
 
@@ -138,10 +139,10 @@ const Orders = () => {
                   className="block w-full min-w-[8rem] rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
                 >
                   <option value="All orders">All orders</option>
-                  <option value="pre-order">Pre-order</option>
-                  <option value="transit">In transit</option>
-                  <option value="confirmed">Confirmed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="Pending">Pending</option>
+                  <option value="In-transit">In transit</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Rejected">Rejected</option>
                 </select>
               </div>
 
@@ -309,7 +310,7 @@ const StatusIcon = ({ status }) => {
           />
         </svg>
       );
-    case "Cancelled":
+    case "Rejected":
       return (
         <svg
           className="me-1 h-3 w-3"
@@ -377,7 +378,7 @@ const getStatusColor = (status) => {
   switch (status) {
     case "Delivered":
       return "green";
-    case "Cancelled":
+    case "Rejected":
       return "red";
     case "In-transit":
       return "blue";

@@ -45,9 +45,7 @@ const ProductDetail = () => {
     const fetchVariants = async () => {
       console.log("Fetching variants for product:", id);
       try {
-        const response = await axiosInstance.get(
-          `/products/variants/${id}`
-        );
+        const response = await axiosInstance.get(`/products/variants/${id}`);
         console.log("Raw variants data:", response.data);
 
         const variantsArray = response.data?.variants || response.data || [];
@@ -157,7 +155,7 @@ const ProductDetail = () => {
       setVariantStock(currentVariant?.quantity || 0);
     } else {
       const totalStockForSize = variants
-        .filter(variant => variant.size === size)
+        .filter((variant) => variant.size === size)
         .reduce((total, variant) => total + variant.quantity, 0);
       setVariantStock(totalStockForSize);
     }
@@ -172,7 +170,7 @@ const ProductDetail = () => {
       setVariantStock(currentVariant?.quantity || 0);
     } else {
       const totalStockForColor = variants
-        .filter(variant => variant.color === color)
+        .filter((variant) => variant.color === color)
         .reduce((total, variant) => total + variant.quantity, 0);
       setVariantStock(totalStockForColor);
     }
@@ -244,10 +242,7 @@ const ProductDetail = () => {
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   ({product.rating})
                 </p>
-                <a
-                  href="#reviews"
-                  className="text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white"
-                >
+                <a className="text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white">
                   {product.reviewCount} Reviews
                 </a>
               </div>
@@ -426,41 +421,6 @@ const ProductDetail = () => {
               <p className="text-gray-500 dark:text-gray-400">
                 {product.additionalInfo}
               </p>
-            )}
-          </div>
-        </div>
-
-        {/* Recommended Products Section */}
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Sản phẩm bạn có thể thích</h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {recommendedProducts.length > 0 ? (
-              recommendedProducts.slice(0, 4).map((recommendedProduct) => (
-                <div key={recommendedProduct._id} className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                  <div className="h-56 w-full cursor-pointer" onClick={() => navigate(`/product-detail/${recommendedProduct._id}`)}>
-                    <img
-                      className="mx-auto h-full dark:hidden"
-                      src={recommendedProduct.image || "https://flowbite.s3.amazonaws.com/blocks/e-commerce/products/default.svg"}
-                      alt={recommendedProduct.name}
-                    />
-                    <img
-                      className="mx-auto hidden h-full dark:block"
-                      src={recommendedProduct.image || "https://flowbite.s3.amazonaws.com/blocks/e-commerce/products/default-dark.svg"}
-                      alt={recommendedProduct.name}
-                    />
-                  </div>
-                  <div className="pt-6">
-                    <Link to={`/product-detail/${recommendedProduct._id}`} className="text-lg font-semibold leading-tight text-gray-900 hover:underline dark:text-white">
-                      {recommendedProduct.title}
-                    </Link>
-                    <p className="text-xl font-extrabold leading-tight text-gray-900 dark:text-white">
-                      {formatVND(recommendedProduct.price)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400">Không có sản phẩm nào được đề xuất.</p>
             )}
           </div>
         </div>

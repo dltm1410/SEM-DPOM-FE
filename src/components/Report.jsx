@@ -6,6 +6,7 @@ const Report = () => {
   const [totalOrders, setTotalOrders] = useState(0); // Biến để lưu số lượng đơn hàng
   const [totalValue, setTotalValue] = useState(0); // Biến để lưu tổng giá trị đơn hàng
   const [averageOrderValue, setAverageOrderValue] = useState(0); // Biến để lưu giá trị trung bình đơn hàng
+  const [topProducts, setTopProducts] = useState([]); // Add a state for top products
 
   const fetchOrders = async () => {
     try {
@@ -37,25 +38,28 @@ const Report = () => {
     return total / orders.length; // Tính giá trị trung bình
   };
 
+  const fetchTopProducts = async () => {
+    try {
+      const response = await axiosInstance.get("/products/top-selling");
+      if (response.data.success) {
+        setTopProducts(response.data.topProducts); // Update top products from API response
+      } else {
+        console.error("Error fetching top products:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching top products:", error);
+    }
+  };
+
   useEffect(() => {
     fetchOrders(); // Gọi hàm để lấy dữ liệu đơn hàng
+    fetchTopProducts(); // Fetch top products
   }, []);
 
   // Sắp xếp đơn hàng theo ngày giảm dần
   const sortedOrders = [...orders].sort(
     (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
   );
-
-  // Mock data cho báo cáo
-  const reportData = {
-    totalRevenue: 15000000,
-    averageOrderValue: 100000,
-    topProducts: [
-      { name: "Product A", quantity: 50, revenue: 5000000 },
-      { name: "Product B", quantity: 30, revenue: 3000000 },
-      { name: "Product C", quantity: 25, revenue: 2500000 },
-    ],
-  };
 
   const handleExport = () => {
     // Xử lý logic export report
@@ -151,10 +155,10 @@ const Report = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.topProducts.map((product, index) => (
+              {topProducts.map((product, index) => (
                 <tr key={index} className="border-b dark:border-gray-700">
-                  <td className="px-4 py-2">{product.name}</td>
-                  <td className="px-4 py-2">{product.quantity}</td>
+                  <td className="px-4 py-2">{product.productName}</td>
+                  <td className="px-4 py-2">{product.quantitySold}</td>
                   <td className="px-4 py-2">
                     {product.revenue.toLocaleString("vi-VN", {
                       style: "currency",
@@ -206,17 +210,16 @@ const Report = () => {
                   </td>
                   <td className="px-4 py-2">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === "In-transit"
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === "In-transit"
                           ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                           : order.status === "Deliveried"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : order.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                          : order.status === "Rejected"
-                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                          : ""
-                      }`}
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                            : order.status === "Pending"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                              : order.status === "Rejected"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                : ""
+                        }`}
                     >
                       {order.status}
                     </span>

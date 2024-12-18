@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../api/axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const formatVND = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -18,15 +19,22 @@ const Orders = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [orderType, setOrderType] = useState("All orders");
   const [duration, setDuration] = useState("all time");
+  const { user } = useAuth();
 
   // Fetch orders từ API
   useEffect(() => {
     const fetchOrders = async () => {
+      // Don't fetch if no user
+      if (!user?._id) {
+        console.log("No user ID available yet");
+        return;
+      }
+
       try {
         setIsLoading(true);
+        console.log("Fetching orders for user:", user._id);
         const response = await axiosInstance.get("/orders");
         console.log("Raw API response:", response);
-        console.log("Orders data:", response.data);
 
         // Đảm bảo response.data là một mảng
         const ordersData = Array.isArray(response.data)
@@ -34,21 +42,26 @@ const Orders = () => {
           : response.data.orders || [];
 
         console.log("Orders array:", ordersData);
+        console.log("Current user ID:", user._id);
 
-        // Map API data to match UI format
-        const formattedOrders = ordersData.map((order) => ({
-          oID: order.orderId,
-          createDate: new Date(order.orderDate).toLocaleDateString("vi-VN"),
-          totalPrice: order.total,
-          status: order.status || "Pending",
-        }));
+        // Filter orders for current user and map to UI format
+        const formattedOrders = ordersData
+          .filter(order => {
+            console.log("Comparing order userId:", order.userId, "with user._id:", user._id);
+            return order.userId === user._id;
+          })
+          .map((order) => ({
+            oID: order.orderId,
+            createDate: new Date(order.orderDate).toLocaleDateString("vi-VN"),
+            totalPrice: order.total,
+            status: order.status || "Pending",
+          }));
 
-        console.log("Formatted orders:", formattedOrders);
+        console.log("Filtered and formatted orders:", formattedOrders);
         setOrders(formattedOrders);
       } catch (error) {
         console.error("Error fetching orders:", error);
-        console.error("Error response:", error.response?.data);
-        toast.error("Không thể tải danh sách đơn hàng");
+        toast.error("Could not load orders");
         setOrders([]);
       } finally {
         setIsLoading(false);
@@ -56,7 +69,7 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [user]);  // Changed dependency to user object
 
   const filteredOrders = orders.filter((order) => {
     // Filter based on selected order type
@@ -110,6 +123,54 @@ const Orders = () => {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-700"></div>
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No orders</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            You haven't made any orders yet. Start shopping to see your orders here.
+          </p>
+          <div className="mt-6">
+            <Link
+              to="/"
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <svg
+                className="-ml-1 mr-2 h-5 w-5"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Start Shopping
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -266,11 +327,10 @@ const OrderItem = ({ orderId, date, price, status, statusColor }) => {
           <button
             type="button"
             disabled={status === "Cancelled"}
-            className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${
-              status === "Cancelled"
-                ? "cursor-not-allowed opacity-50"
-                : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
-            } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
+            className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${status === "Cancelled"
+              ? "cursor-not-allowed opacity-50"
+              : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
+              } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
           >
             Cancel order
           </button>

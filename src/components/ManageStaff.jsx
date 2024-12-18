@@ -13,7 +13,7 @@ const ManageStaff = () => {
     firstName: "",
     lastName: "",
     email: "",
-    gender: "male",
+    gender: "Male",
     address: "",
     phoneNumber: "",
   });
@@ -22,7 +22,7 @@ const ManageStaff = () => {
   const [isEditStaffModalOpen, setIsEditStaffModalOpen] = useState(false);
   const [editStaffForm, setEditStaffForm] = useState({
     username: "",
-    role: "",
+    role: "staff",
     firstName: "",
     lastName: "",
     email: "",
@@ -50,17 +50,16 @@ const ManageStaff = () => {
 
   const handleEdit = async (userId) => {
     try {
-      // Gọi API để lấy thông tin chi tiết của nhân viên
       const response = await axiosInstance.get(`/users/${userId}`);
       console.log("user dang edit", response);
       const staffData = response.data;
 
       // Cập nhật state với thông tin nhân viên
       setSelectedStaff(staffData);
-      setNewStaff({
+      setEditStaffForm({
         username: staffData.username,
         role: staffData.role,
-        password: "", // Giữ password trống khi edit
+        password: staffData.password, // Giữ password trống khi edit
         firstName: staffData.firstName,
         lastName: staffData.lastName,
         email: staffData.email,
@@ -68,8 +67,8 @@ const ManageStaff = () => {
         address: staffData.address,
         phoneNumber: staffData.phoneNumber,
       });
+      console.log("m", editStaffForm);
       setIsEditStaffModalOpen(true);
-      console.log(staffData);
     } catch (error) {
       console.error("Lỗi khi lấy thông tin nhân viên:", error);
     }
@@ -78,26 +77,12 @@ const ManageStaff = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitted Values:", newStaff);
-
     try {
-      if (isEditMode) {
-        const response = await axiosInstance.put(
-          `/users/${selectedStaff.userID}`,
-          newStaff
-        );
-        setStaffUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.userID === selectedStaff.userID ? response.data.user : user
-          )
-        );
-      } else {
-        const response = await axiosInstance.post("/users", newStaff);
-        setStaffUsers((prevUsers) => [...prevUsers, response.data.user]);
-      }
+      const response = await axiosInstance.post("/users", newStaff);
+
+      setStaffUsers((prevUsers) => [...prevUsers, response.data.user]);
 
       setIsAddStaffModalOpen(false);
-      setIsEditMode(false);
-      setSelectedStaff(null);
       setNewStaff({
         username: "",
         role: "staff",
@@ -110,7 +95,7 @@ const ManageStaff = () => {
         phoneNumber: "",
       });
 
-      fetchStaffUsers(); // Tải lại dữ liệu sau khi thêm hoặc cập nhật
+      fetchStaffUsers();
     } catch (err) {
       console.error("Error saving staff:", err);
     }
@@ -469,8 +454,9 @@ const ManageStaff = () => {
                   e.preventDefault();
                   try {
                     console.log("submit edit", selectedStaff);
+                    console.log(editStaffForm);
                     const response = await axiosInstance.put(
-                      `/users/update/${selectedStaff._id}`,
+                      `/users/${selectedStaff._id}`,
                       editStaffForm
                     );
                     console.log("select", response.data);
@@ -484,6 +470,7 @@ const ManageStaff = () => {
                       );
                       setIsEditStaffModalOpen(false);
                       setSelectedStaff(null);
+                      fetchStaffUsers();
                     }
                   } catch (error) {
                     console.error("Error:", error);

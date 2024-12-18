@@ -5,6 +5,7 @@ const Report = () => {
   const [orders, setOrders] = useState([]); // Thêm state để lưu trữ đơn hàng
   const [totalOrders, setTotalOrders] = useState(0); // Biến để lưu số lượng đơn hàng
   const [totalValue, setTotalValue] = useState(0); // Biến để lưu tổng giá trị đơn hàng
+  const [averageOrderValue, setAverageOrderValue] = useState(0); // Biến để lưu giá trị trung bình đơn hàng
 
   const fetchOrders = async () => {
     try {
@@ -13,6 +14,7 @@ const Report = () => {
         setOrders(response.data.orders); // Lưu dữ liệu đơn hàng vào state
         setTotalOrders(response.data.orders.length); // Cập nhật số lượng đơn hàng
         setTotalValue(calculateTotalValue(response.data.orders)); // Tính tổng giá trị đơn hàng
+        setAverageOrderValue(calculateAverageOrderValue(response.data.orders)); // Tính giá trị trung bình đơn hàng
         console.log("Dữ liệu đơn hàng:", response.data.orders);
       } else {
         console.error("Lỗi khi lấy dữ liệu đơn hàng:", response.data.message);
@@ -21,6 +23,7 @@ const Report = () => {
       console.error("Lỗi khi lấy dữ liệu đơn hàng:", error);
       setTotalOrders(0); // Đặt lại totalOrders về 0 nếu có lỗi
       setTotalValue(0); // Đặt lại totalValue về 0 nếu có lỗi
+      setAverageOrderValue(0); // Đặt lại averageOrderValue về 0 nếu có lỗi
     }
   };
 
@@ -28,9 +31,20 @@ const Report = () => {
     return orders.reduce((acc, order) => acc + order.total, 0); // Tính tổng giá trị
   };
 
+  const calculateAverageOrderValue = (orders) => {
+    if (orders.length === 0) return 0; // Trả về 0 nếu không có đơn hàng
+    const total = calculateTotalValue(orders); // Tính tổng giá trị
+    return total / orders.length; // Tính giá trị trung bình
+  };
+
   useEffect(() => {
     fetchOrders(); // Gọi hàm để lấy dữ liệu đơn hàng
   }, []);
+
+  // Sắp xếp đơn hàng theo ngày giảm dần
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.orderDate) - new Date(a.orderDate)
+  );
 
   // Mock data cho báo cáo
   const reportData = {
@@ -40,11 +54,6 @@ const Report = () => {
       { name: "Product A", quantity: 50, revenue: 5000000 },
       { name: "Product B", quantity: 30, revenue: 3000000 },
       { name: "Product C", quantity: 25, revenue: 2500000 },
-    ],
-    recentOrders: [
-      { id: "#123", date: "2024-03-15", total: 150000, status: "Deliveried" },
-      { id: "#124", date: "2024-03-14", total: 200000, status: "In-transit" },
-      { id: "#125", date: "2024-03-13", total: 180000, status: "Deliveried" },
     ],
   };
 
@@ -105,7 +114,7 @@ const Report = () => {
             Average Order Value
           </h3>
           <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-            {reportData.averageOrderValue.toLocaleString("vi-VN", {
+            {averageOrderValue.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
@@ -183,10 +192,12 @@ const Report = () => {
               </tr>
             </thead>
             <tbody>
-              {reportData.recentOrders.map((order, index) => (
+              {sortedOrders.map((order, index) => (
                 <tr key={index} className="border-b dark:border-gray-700">
-                  <td className="px-4 py-2">{order.id}</td>
-                  <td className="px-4 py-2">{order.date}</td>
+                  <td className="px-4 py-2">#{order.orderId}</td>
+                  <td className="px-4 py-2">
+                    {new Date(order.orderDate).toLocaleDateString("vi-VN")}
+                  </td>
                   <td className="px-4 py-2">
                     {order.total.toLocaleString("vi-VN", {
                       style: "currency",
@@ -196,9 +207,15 @@ const Report = () => {
                   <td className="px-4 py-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === "Deliveried"
+                        order.status === "In-transit"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                          : order.status === "Deliveried"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : order.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : order.status === "Rejected"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : ""
                       }`}
                     >
                       {order.status}

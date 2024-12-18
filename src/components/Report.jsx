@@ -12,9 +12,9 @@ const Report = () => {
       { name: "Product C", quantity: 25, revenue: 2500000 },
     ],
     recentOrders: [
-      { id: "#123", date: "2024-03-15", total: 150000, status: "Completed" },
-      { id: "#124", date: "2024-03-14", total: 200000, status: "Processing" },
-      { id: "#125", date: "2024-03-13", total: 180000, status: "Completed" },
+      { id: "#123", date: "2024-03-15", total: 150000, status: "Deliveried" },
+      { id: "#124", date: "2024-03-14", total: 200000, status: "In-transit" },
+      { id: "#125", date: "2024-03-13", total: 180000, status: "Deliveried" },
     ],
   };
 
@@ -166,7 +166,7 @@ const Report = () => {
                   <td className="px-4 py-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        order.status === "Completed"
+                        order.status === "Deliveried"
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                           : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
                       }`}

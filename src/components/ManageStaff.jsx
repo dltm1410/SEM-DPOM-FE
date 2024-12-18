@@ -77,6 +77,8 @@ const ManageStaff = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitted Values:", newStaff);
+
     try {
       if (isEditMode) {
         const response = await axiosInstance.put(

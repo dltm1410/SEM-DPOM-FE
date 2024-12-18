@@ -1,16 +1,24 @@
 import { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import ManageProduct from "./ManageProduct";
 import ProcessOrder from "./ProcessOrder";
 import Report from "./Report";
 import ManageStaff from "./ManageStaff";
+import NotFound from "./NotFound";
 
 const Staff = () => {
   const [currentView, setCurrentView] = useState("manageProduct");
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleNavigation = (view) => {
+    setCurrentView(view);
+    navigate(`/staff/${view}`);
+  };
 
   const handleLogout = () => {
-    // Xử lý đăng xuất, ví dụ: xóa token, chuyển hướng đến trang đăng nhập
-    localStorage.removeItem("token"); // Xóa token nếu bạn lưu trong localStorage
-    window.location.href = "/signin"; // Chuyển hướng đến trang đăng nhập
+    logout();
   };
 
   return (
@@ -125,7 +133,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("manageProduct")}
+                onClick={() => handleNavigation("manageProduct")}
               >
                 <svg
                   aria-hidden="true"
@@ -146,7 +154,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("processOrder")}
+                onClick={() => handleNavigation("processOrder")}
               >
                 <svg
                   aria-hidden="true"
@@ -171,7 +179,7 @@ const Staff = () => {
               <button
                 type="button"
                 className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => setCurrentView("manageStaff")}
+                onClick={() => handleNavigation("manageStaff")}
               >
                 <svg
                   aria-hidden="true"
@@ -194,10 +202,10 @@ const Staff = () => {
           </ul>
           <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <li>
-              <a
-                href="#"
-                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
-                onClick={() => setCurrentView("report")}
+              <button
+                type="button"
+                className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                onClick={() => handleNavigation("report")}
               >
                 <svg
                   aria-hidden="true"
@@ -213,8 +221,10 @@ const Staff = () => {
                     d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
                   />
                 </svg>
-                <span className="ml-3">Report</span>
-              </a>
+                <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                  Report
+                </span>
+              </button>
             </li>
           </ul>
           <div className="fixed bottom-4 left-4 flex items-center">
@@ -245,10 +255,14 @@ const Staff = () => {
 
       {/* Main content */}
       <main className="p-4 md:ml-64 h-auto pt-20">
-        {currentView === "manageProduct" && <ManageProduct />}
-        {currentView === "processOrder" && <ProcessOrder />}
-        {currentView === "report" && <Report />}
-        {currentView === "manageStaff" && <ManageStaff />}
+        <Routes>
+          <Route path="/" element={<ManageProduct />} />
+          <Route path="/manageProduct" element={<ManageProduct />} />
+          <Route path="/processOrder" element={<ProcessOrder />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/manageStaff" element={<ManageStaff />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </main>
 
       {/* Nút Logout */}

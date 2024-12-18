@@ -40,7 +40,7 @@ const ProductCard = ({ product, onProductClick }) => {
         {/* Product Info */}
         <div className="mb-4 flex items-center justify-between gap-4">
           <span className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300 me-2 rounded px-2.5 py-0.5 text-xs font-medium">
-            {product.material}
+            {product.category}
           </span>
 
           {/* Quick Actions */}

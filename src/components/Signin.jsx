@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { axiosInstance } from "../api/axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const Signin = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const {
     register,
@@ -17,22 +18,30 @@ const Signin = () => {
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
+      console.log("Attempting login with:", data);
+
       const response = await axiosInstance.post("/auth/login", {
         email: data.email,
         password: data.password,
       });
 
-      // Lưu token vào localStorage
-      localStorage.setItem("token", response.data.accessToken);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      // Thông báo thành công
-      toast.success("Đăng nhập thành công!");
+      console.log("Login response:", response.data);
 
-      // Chuyển hướng về trang chủ
-      navigate("/");
+      // Check the actual structure of your response
+      const { accessToken, user } = response.data;
+
+      if (accessToken && user) {
+        console.log("Login successful, user:", user);
+        // Call login from AuthContext which will handle token storage and navigation
+        await login(accessToken, user);
+        toast.success("Login successful!");
+      } else {
+        console.error("Invalid response structure:", response.data);
+        toast.error("Invalid response from server");
+      }
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error(error.response?.data?.message || "Đăng nhập thất bại!");
+      console.error("Login error:", error.response || error);
+      toast.error(error.response?.data?.message || "Login failed!");
     } finally {
       setIsLoading(false);
     }
@@ -109,29 +118,6 @@ const Signin = () => {
                     {errors.password.message}
                   </p>
                 )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      type="checkbox"
-                      {...register("remember")}
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label className="text-gray-500 dark:text-gray-300">
-                      Remember me
-                    </label>
-                  </div>
-                </div>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500"
-                >
-                  Forgot password?
-                </Link>
               </div>
 
               <button

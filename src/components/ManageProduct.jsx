@@ -16,9 +16,9 @@ const ManageProduct = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    stock: "",
+    title: "",
+    categoryId: "",
+    description: "",
     price: "",
     rating: "0",
   });
@@ -78,19 +78,33 @@ const ManageProduct = () => {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
+    const productData = {
+      title: newProduct.title.trim(),
+      description: newProduct.description,
+      price: parseFloat(newProduct.price),
+      categoryId: newProduct.categoryId,
+    };
+
+    if (!productData.title) {
+      console.error("Title không được để trống");
+      return;
+    }
+
+    console.log("Dữ liệu sản phẩm được gửi đi:", productData);
+
     try {
-      const response = await axiosInstance.post("/products", newProduct);
+      const response = await axiosInstance.post("/products", productData);
       if (response.status === 201) {
         setProducts([...products, response.data]);
         setIsModalOpen(false);
         setNewProduct({
-          name: "",
-          category: "",
-          stock: "",
+          title: "",
+          categoryId: "",
+          description: "",
           price: "",
-          rating: "0",
         });
       }
+      fetchProducts();
     } catch (error) {
       console.error("Lỗi khi thêm sản phẩm:", error);
     }
@@ -118,6 +132,26 @@ const ManageProduct = () => {
       }
     } catch (error) {
       console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
+
+  const handleEditProduct = async (productId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/products/id/${productId}`,
+        editForm
+      );
+      if (response.status === 200) {
+        setProducts(
+          products.map((product) =>
+            product._id === productId ? response.data : product
+          )
+        );
+        setIsEditModalOpen(false);
+        setSelectedProduct(null);
+      }
+    } catch (error) {
+      console.error("Lỗi khi chỉnh sửa sản phẩm:", error);
     }
   };
 
@@ -234,9 +268,9 @@ const ManageProduct = () => {
                       <div className="flex items-center">
                         <div
                           className={`inline-block w-4 h-4 mr-2 ${
-                            product.totalStock > 1000
+                            product.totalStock > 800
                               ? "bg-green-500"
-                              : product.totalStock > 900
+                              : product.totalStock > 700
                               ? "bg-yellow-300"
                               : "bg-red-700"
                           } rounded-full`}
@@ -345,9 +379,9 @@ const ManageProduct = () => {
                     id="name"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     required
-                    value={newProduct.name}
+                    value={newProduct.title}
                     onChange={(e) =>
-                      setNewProduct({ ...newProduct, name: e.target.value })
+                      setNewProduct({ ...newProduct, title: e.target.value })
                     }
                   />
                 </div>
@@ -362,9 +396,12 @@ const ManageProduct = () => {
                     id="category"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     required
-                    value={newProduct.category}
+                    value={newProduct.categoryId}
                     onChange={(e) =>
-                      setNewProduct({ ...newProduct, category: e.target.value })
+                      setNewProduct({
+                        ...newProduct,
+                        categoryId: e.target.value,
+                      })
                     }
                   >
                     <option value="">Select category</option>
@@ -375,6 +412,47 @@ const ManageProduct = () => {
                         </option>
                       ))}
                   </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="price"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Price
+                  </label>
+                  <input
+                    type="number"
+                    id="price"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    required
+                    value={newProduct.price}
+                    onChange={(e) =>
+                      setNewProduct({ ...newProduct, price: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="description"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    rows="4"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Enter product description..."
+                    value={newProduct.description}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        description: e.target.value,
+                      })
+                    }
+                  />
                 </div>
 
                 {/* Thêm phần footer với buttons vào đây */}
@@ -424,7 +502,7 @@ const ManageProduct = () => {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  console.log("Updating product:", editForm);
+                  handleEditProduct(selectedProduct._id);
                 }}
                 className="space-y-4"
               >

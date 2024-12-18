@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { axiosInstance } from "../api/axios";
 import { toast } from "react-toastify";
 
@@ -44,9 +43,10 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchVariants = async () => {
+      console.log("Fetching variants for product:", id);
       try {
-        const response = await axios.get(
-          `http://localhost:5001/api/v1/products/variants/${id}`
+        const response = await axiosInstance.get(
+          `/products/variants/${id}`
         );
         console.log("Raw variants data:", response.data);
 
@@ -77,7 +77,7 @@ const ProductDetail = () => {
     const fetchRecommendedProducts = async () => {
       if (product) {
         try {
-          const response = await axios.post("http://localhost:5001/api/v1/products/recommend", {
+          const response = await axiosInstance.post("/products/recommend", {
             productName: product.title,
           });
           setRecommendedProducts(response.data.similarProducts || []);
@@ -150,33 +150,31 @@ const ProductDetail = () => {
 
   const handleSizeChange = (size) => {
     setSelectedSize(size);
-    if (
-      selectedColor &&
-      variants &&
-      Array.isArray(variants) &&
-      variants.length > 0
-    ) {
+    if (selectedColor) {
       const currentVariant = variants.find(
         (variant) => variant.size === size && variant.color === selectedColor
       );
-      console.log("Selected variant after size change:", currentVariant);
       setVariantStock(currentVariant?.quantity || 0);
+    } else {
+      const totalStockForSize = variants
+        .filter(variant => variant.size === size)
+        .reduce((total, variant) => total + variant.quantity, 0);
+      setVariantStock(totalStockForSize);
     }
   };
 
   const handleColorChange = (color) => {
     setSelectedColor(color);
-    if (
-      selectedSize &&
-      variants &&
-      Array.isArray(variants) &&
-      variants.length > 0
-    ) {
+    if (selectedSize) {
       const currentVariant = variants.find(
         (variant) => variant.size === selectedSize && variant.color === color
       );
-      console.log("Selected variant after color change:", currentVariant);
       setVariantStock(currentVariant?.quantity || 0);
+    } else {
+      const totalStockForColor = variants
+        .filter(variant => variant.color === color)
+        .reduce((total, variant) => total + variant.quantity, 0);
+      setVariantStock(totalStockForColor);
     }
   };
 
@@ -407,8 +405,12 @@ const ProductDetail = () => {
                   </button>
                 </div>
                 <span className="text-sm text-gray-500">
-                  {!selectedSize
+                  {!selectedSize && !selectedColor
+                    ? "Please select size and color"
+                    : !selectedSize
                     ? "Please select size"
+                    : !selectedColor
+                    ? "Please select color"
                     : variantStock > 0
                     ? `Available: ${variantStock}`
                     : "Out of stock"}

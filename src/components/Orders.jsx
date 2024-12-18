@@ -22,61 +22,58 @@ const Orders = () => {
   const { user } = useAuth();
 
   // Fetch orders từ API
+  const fetchOrders = async () => {
+    // Don't fetch if no user
+    if (!user?._id) {
+      console.log("No user ID available yet");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      console.log("Fetching orders for user:", user._id);
+      const response = await axiosInstance.get("/orders");
+      console.log("Raw API response:", response);
+
+      // Đảm bảo response.data là một mảng
+      const ordersData = Array.isArray(response.data)
+        ? response.data
+        : response.data.orders || [];
+
+      console.log("Orders array:", ordersData);
+      console.log("Current user ID:", user._id);
+
+      // Filter orders for current user and map to UI format
+      const formattedOrders = ordersData
+        .filter((order) => order.userId === user._id)
+        .map((order) => ({
+          oID: order.orderId,
+          createDate: new Date(order.orderDate).toLocaleDateString("vi-VN"),
+          totalPrice: order.total,
+          status: order.status || "Pending",
+        }));
+
+      console.log("Filtered and formatted orders:", formattedOrders);
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      toast.error("Could not load orders");
+      setOrders([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      // Don't fetch if no user
-      if (!user?._id) {
-        console.log("No user ID available yet");
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        console.log("Fetching orders for user:", user._id);
-        const response = await axiosInstance.get("/orders");
-        console.log("Raw API response:", response);
-
-        // Đảm bảo response.data là một mảng
-        const ordersData = Array.isArray(response.data)
-          ? response.data
-          : response.data.orders || [];
-
-        console.log("Orders array:", ordersData);
-        console.log("Current user ID:", user._id);
-
-        // Filter orders for current user and map to UI format
-        const formattedOrders = ordersData
-          .filter(order => {
-            console.log("Comparing order userId:", order.userId, "with user._id:", user._id);
-            return order.userId === user._id;
-          })
-          .map((order) => ({
-            oID: order.orderId,
-            createDate: new Date(order.orderDate).toLocaleDateString("vi-VN"),
-            totalPrice: order.total,
-            status: order.status || "Pending",
-          }));
-
-        console.log("Filtered and formatted orders:", formattedOrders);
-        setOrders(formattedOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        toast.error("Could not load orders");
-        setOrders([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchOrders();
-  }, [user]);  // Changed dependency to user object
+  }, [user]); // Changed dependency to user object
 
   const filteredOrders = orders.filter((order) => {
     // Filter based on selected order type
     const typeMatch = orderType === "All orders" || order.status === orderType;
 
     // Parse the order creation date - convert from "DD/MM/YYYY" format
-    const [day, month, year] = order.createDate.split('/');
+    const [day, month, year] = order.createDate.split("/");
     const orderDate = new Date(year, month - 1, day); // month is 0-based in JS
     const currentDate = new Date();
     let dateMatch = false;
@@ -145,9 +142,12 @@ const Orders = () => {
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
             />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No orders</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            No orders
+          </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            You haven't made any orders yet. Start shopping to see your orders here.
+            You haven't made any orders yet. Start shopping to see your orders
+            here.
           </p>
           <div className="mt-6">
             <Link
@@ -244,6 +244,7 @@ const Orders = () => {
                   price={order.totalPrice}
                   status={order.status}
                   statusColor={getStatusColor(order.status)}
+                  fetchOrders={fetchOrders}
                 />
               ))}
             </div>
@@ -269,8 +270,30 @@ const formatOrderId = (orderId) => {
   return orderId.length > 10 ? `${orderId.slice(0, 10)}...` : orderId;
 };
 
-const OrderItem = ({ orderId, date, price, status, statusColor }) => {
+const OrderItem = ({
+  orderId,
+  date,
+  price,
+  status,
+  statusColor,
+  fetchOrders,
+}) => {
   const navigate = useNavigate();
+
+  const handleDelivery = async (orderId) => {
+    console.log(orderId);
+    try {
+      await axiosInstance.put(`/orders/status`, {
+        orderID: orderId,
+        status: "Delivered",
+      });
+      toast.success("Đã chấp nhận đơn hàng");
+      fetchOrders();
+    } catch (error) {
+      console.error("Error accepting order:", error);
+      toast.error("Không thể chấp nhận đơn hàng");
+    }
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-y-4 py-6">
@@ -319,20 +342,42 @@ const OrderItem = ({ orderId, date, price, status, statusColor }) => {
         {status === "Delivered" ? (
           <button
             type="button"
-            className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:border-yellow-400 dark:text-yellow-400 dark:hover:bg-yellow-400 dark:hover:text-white dark:focus:ring-yellow-900 lg:w-auto"
+            disabled
+            className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-green-300 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-500 dark:hover:text-white dark:focus:ring-green-600 lg:w-auto"
           >
-            Rating
+            Delivered
+          </button>
+        ) : status === "In-transit" ? (
+          <button
+            type="button"
+            onClick={() => handleDelivery(orderId)}
+            className="w-full rounded-lg border border-green-500 px-3 py-2 text-center text-sm font-medium text-green-500 hover:bg-green-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-green-300 dark:border-green-400 dark:text-green-400 dark:hover:bg-green-500 dark:hover:text-white dark:focus:ring-green-600 lg:w-auto"
+          >
+            Delivered
+          </button>
+        ) : status === "Pending" ? (
+          <button
+            type="button"
+            disabled={status === "Pending"}
+            className={`w-full rounded-lg border border-yellow-700 px-3 py-2 text-center text-sm font-medium ${
+              status === "Pending"
+                ? "cursor-not-allowed opacity-50"
+                : "text-yellow-700 hover:bg-yellow-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
+            } dark:border-yellow-500 dark:text-yellow-500 dark:hover:bg-yellow-600 dark:hover:text-white dark:focus:ring-yellow-900 lg:w-auto`}
+          >
+            Delivered
           </button>
         ) : (
           <button
             type="button"
-            disabled={status === "Cancelled"}
-            className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${status === "Cancelled"
-              ? "cursor-not-allowed opacity-50"
-              : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
-              } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
+            disabled={status === "Rejected"}
+            className={`w-full rounded-lg border border-red-700 px-3 py-2 text-center text-sm font-medium ${
+              status === "Rejected"
+                ? "cursor-not-allowed opacity-50"
+                : "text-red-700 hover:bg-red-700 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-300"
+            } dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white dark:focus:ring-red-900 lg:w-auto`}
           >
-            Cancel order
+            Delivered
           </button>
         )}
         <button

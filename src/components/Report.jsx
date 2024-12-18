@@ -1,9 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { axiosInstance } from "../api/axios"; // Đảm bảo import axiosInstance
 
 const Report = () => {
+  const [orders, setOrders] = useState([]); // Thêm state để lưu trữ đơn hàng
+  const [totalOrders, setTotalOrders] = useState(0); // Biến để lưu số lượng đơn hàng
+  const [totalValue, setTotalValue] = useState(0); // Biến để lưu tổng giá trị đơn hàng
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axiosInstance.get("/orders");
+      if (response.data.success) {
+        setOrders(response.data.orders); // Lưu dữ liệu đơn hàng vào state
+        setTotalOrders(response.data.orders.length); // Cập nhật số lượng đơn hàng
+        setTotalValue(calculateTotalValue(response.data.orders)); // Tính tổng giá trị đơn hàng
+        console.log("Dữ liệu đơn hàng:", response.data.orders);
+      } else {
+        console.error("Lỗi khi lấy dữ liệu đơn hàng:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu đơn hàng:", error);
+      setTotalOrders(0); // Đặt lại totalOrders về 0 nếu có lỗi
+      setTotalValue(0); // Đặt lại totalValue về 0 nếu có lỗi
+    }
+  };
+
+  const calculateTotalValue = (orders) => {
+    return orders.reduce((acc, order) => acc + order.total, 0); // Tính tổng giá trị
+  };
+
+  useEffect(() => {
+    fetchOrders(); // Gọi hàm để lấy dữ liệu đơn hàng
+  }, []);
+
   // Mock data cho báo cáo
   const reportData = {
-    totalOrders: 150,
     totalRevenue: 15000000,
     averageOrderValue: 100000,
     topProducts: [
@@ -56,7 +86,7 @@ const Report = () => {
             Total Orders
           </h3>
           <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-            {reportData.totalOrders}
+            {totalOrders !== undefined ? totalOrders : 0}
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
@@ -64,7 +94,7 @@ const Report = () => {
             Total Revenue
           </h3>
           <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-            {reportData.totalRevenue.toLocaleString("vi-VN", {
+            {totalValue.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
